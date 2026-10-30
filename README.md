@@ -1,4 +1,4 @@
-# TechPulse Newsletter App
+# BeingNotified Newsletter App
 
 > AI-curated weekly newsletter for developers who vibe-code — powered by **Gemini 3.8 Flash**, **YouTube Data API v3**, **Next.js 15**, and **FastAPI**.
 
