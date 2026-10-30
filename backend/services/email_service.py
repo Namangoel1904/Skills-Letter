@@ -23,6 +23,19 @@ def _init_resend():
     resend.api_key = settings.resend_api_key
 
 
+def get_sender_email() -> str:
+    """
+    Resolve sender email address.
+    Resend rejects unverified consumer domains like @gmail.com or @yahoo.com.
+    If an unverified consumer domain is configured, fallback to Resend's testing sandbox 'onboarding@resend.dev'.
+    """
+    from_addr = (settings.from_email or "").strip()
+    consumer_domains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@icloud.com"]
+    if not from_addr or any(d in from_addr.lower() for d in consumer_domains):
+        return "onboarding@resend.dev"
+    return from_addr
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  Frequency Schedule Mappings
 # ─────────────────────────────────────────────────────────────────────────────
@@ -179,7 +192,7 @@ def send_welcome_email(
         html_body = render_welcome_email_html(subscriber, latest_edition, unsubscribe_url)
 
         resend.Emails.send({
-            "from": f"{settings.from_name} <{settings.from_email}>",
+            "from": f"{settings.from_name} <{get_sender_email()}>",
             "to": subscriber.email,
             "subject": f"⚡ Welcome to TechPulse — Subscription Confirmed ({schedule_info['label']})",
             "html": html_body,
@@ -225,7 +238,7 @@ def send_newsletter(
             html_body = render_email_html(edition, unsubscribe_url)
 
             resend.Emails.send({
-                "from": f"{settings.from_name} <{settings.from_email}>",
+                "from": f"{settings.from_name} <{get_sender_email()}>",
                 "to": subscriber.email,
                 "subject": f"⚡ {edition.title}",
                 "html": html_body,
