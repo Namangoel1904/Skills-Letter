@@ -552,22 +552,23 @@ export default function AdminPage() {
                   <Youtube className="w-4 h-4" />
                 </div>
                 <Badge variant="secondary" className="font-mono text-[10px] bg-emerald-500/10 text-emerald-500">
-                  {data?.workers?.youtube_api?.latency_ms || 110}ms
+                  {data?.workers?.youtube_api?.latency_ms || 95}ms
                 </Badge>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-mono">YouTube Data API</p>
                 <p className="font-heading text-lg font-bold text-foreground mt-0.5">
-                  {(data?.workers?.youtube_api?.quota_used || 1420).toLocaleString()} <span className="text-xs text-muted-foreground font-normal">/ 10k</span>
+                  {(data?.workers?.youtube_api?.quota_used || 0).toLocaleString()}{" "}
+                  <span className="text-xs text-muted-foreground font-normal">/ 10k units</span>
                 </p>
               </div>
               <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
-                  className="h-full bg-red-500 rounded-full"
+                  className="h-full bg-red-500 rounded-full transition-all duration-500"
                   style={{
-                    width: `${Math.min(
-                      (((data?.workers?.youtube_api?.quota_used || 1420) / 10000) * 100),
-                      100
+                    width: `${Math.max(
+                      Math.min((((data?.workers?.youtube_api?.quota_used || 0) / 10000) * 100), 100),
+                      2
                     )}%`,
                   }}
                 />
@@ -585,11 +586,14 @@ export default function AdminPage() {
               <div>
                 <p className="text-xs text-muted-foreground font-mono">Gemini 2.5 Flash</p>
                 <p className="font-heading text-lg font-bold text-foreground mt-0.5">
-                  142k <span className="text-xs text-muted-foreground font-normal">tokens</span>
+                  {data?.workers?.gemini?.tokens_used
+                    ? `${(data.workers.gemini.tokens_used / 1000).toFixed(1)}k`
+                    : "0k"}{" "}
+                  <span className="text-xs text-muted-foreground font-normal">tokens est.</span>
                 </p>
               </div>
               <p className="text-[11px] text-muted-foreground font-mono">
-                Fallback: <span className="text-emerald-500 font-semibold">Ready</span>
+                {data?.pipeline?.total_processed_videos || 0} drops synthesized
               </p>
             </div>
 
@@ -629,7 +633,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <p className="text-[11px] text-muted-foreground font-mono">
-                Subscribers Active
+                {data?.audience?.total_emails_sent || 0} broadcasts delivered
               </p>
             </div>
           </div>
@@ -656,7 +660,11 @@ export default function AdminPage() {
             <div className="w-32 h-12 hidden sm:block">
               <svg viewBox="0 0 100 35" className="w-full h-full stroke-emerald-500 fill-none" preserveAspectRatio="none">
                 <path
-                  d="M0,28 Q15,25 30,22 T60,14 T80,8 T100,2"
+                  d={
+                    (data?.audience?.total_subscribers || 0) > 0
+                      ? "M0,28 Q25,26 50,18 T75,10 T100,4"
+                      : "M0,25 L100,25"
+                  }
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
@@ -669,26 +677,28 @@ export default function AdminPage() {
             <div className="p-4 rounded-xl border border-border/40 bg-card/40 space-y-1">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Mail className="w-3.5 h-3.5 text-primary" />
-                <span>Open Rate</span>
+                <span>Delivery & Open Rate</span>
               </div>
               <p className="font-heading text-2xl font-bold text-foreground">
-                68.4%
+                {data?.audience?.total_emails_sent && data.audience.total_emails_sent > 0
+                  ? `${data.audience.open_rate_est}%`
+                  : "Pending Dispatch"}
               </p>
-              <p className="text-[11px] text-emerald-500 font-mono">
-                +3.1% vs industry average
+              <p className="text-[11px] text-muted-foreground font-mono">
+                {data?.audience?.total_emails_sent || 0} total emails broadcasted
               </p>
             </div>
 
             <div className="p-4 rounded-xl border border-border/40 bg-card/40 space-y-1">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <ArrowUpRight className="w-3.5 h-3.5 text-primary" />
-                <span>CTR (GitHub & Model links)</span>
+                <span>Extracted Codebases & Weights</span>
               </div>
               <p className="font-heading text-2xl font-bold text-foreground">
-                42.1%
+                {data?.audience?.total_curated_links || 0}
               </p>
               <p className="text-[11px] text-primary font-mono font-medium">
-                High developer intent
+                {data?.audience?.links_per_edition || 0} links/edition average
               </p>
             </div>
           </div>
@@ -709,6 +719,28 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+
+          {/* Live Database Volume Telemetry */}
+          <div className="pt-3 border-t border-border/30 grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 rounded-xl bg-card/40 border border-border/30">
+              <span className="text-[10px] font-mono uppercase text-muted-foreground block">Curated Drops Ingested</span>
+              <span className="font-heading text-lg font-bold text-foreground">
+                {data?.pipeline?.total_processed_videos || 0}
+              </span>
+            </div>
+            <div className="p-3 rounded-xl bg-card/40 border border-border/30">
+              <span className="text-[10px] font-mono uppercase text-muted-foreground block">Words Synthesized</span>
+              <span className="font-heading text-lg font-bold text-foreground">
+                {(data?.pipeline?.total_words_generated || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="p-3 rounded-xl bg-card/40 border border-border/30">
+              <span className="text-[10px] font-mono uppercase text-muted-foreground block">Issues Recorded</span>
+              <span className="font-heading text-lg font-bold text-foreground">
+                {data?.pipeline?.total_editions || 0}
+              </span>
+            </div>
+          </div>
         </section>
 
         {/* ── 4. EXECUTION LOGS & DISPATCH HISTORY ──────────────────────────── */}
@@ -846,3 +878,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

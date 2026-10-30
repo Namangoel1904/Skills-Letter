@@ -46,9 +46,13 @@ export interface SubscribePayload {
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...((init?.headers as Record<string, string>) || {}),
+  };
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
+    headers,
   });
   if (!res.ok) {
     const error = await res.json().catch(() => ({ detail: res.statusText }));
@@ -109,11 +113,13 @@ export interface WorkerStatus {
   quota_total?: number;
   model?: string;
   fallback?: string;
+  tokens_used?: number;
   schedule?: string;
   schedule_detail?: string;
   from_email?: string;
   from_name?: string;
   active_subscribers?: number;
+  total_emails_sent?: number;
 }
 
 export interface EditionHistoryItem {
@@ -134,6 +140,10 @@ export interface AdminDashboardData {
     total_subscribers: number;
     recent_growth_7d: number;
     frequency_breakdown: Record<string, number>;
+    total_emails_sent: number;
+    total_curated_links: number;
+    links_per_edition: number;
+    total_words_generated: number;
     open_rate_est: number;
     ctr_est: number;
   };
@@ -141,6 +151,8 @@ export interface AdminDashboardData {
     next_edition_number: number;
     total_editions: number;
     total_processed_videos: number;
+    total_words_generated: number;
+    total_curated_links: number;
     cron_expression: string;
     cron_timezone: string;
     cron_human: string;
