@@ -239,9 +239,39 @@ export const CATEGORY_META: Record<VideoSummary["category"], { label: string; em
   other:       { label: "Curated Technical Drops", emoji: "📦", color: "slate", description: "Deep dives and architecture discussions" },
 };
 
-export const FREQUENCY_OPTIONS: { value: FrequencyOption; label: string; description: string }[] = [
-  { value: "daily",     label: "Daily",       description: "Every day" },
-  { value: "5x_week",  label: "5× / week",   description: "Monday – Friday" },
-  { value: "2x_week",  label: "2× / week",   description: "Monday & Thursday" },
-  { value: "weekly",   label: "Weekly",      description: "Every Friday · 5 PM IST (default)" },
+export const FREQUENCY_OPTIONS: {
+  value: FrequencyOption;
+  label: string;
+  badge: string;
+  schedule: string;
+  description: string;
+}[] = [
+  {
+    value: "weekly",
+    label: "Weekly Flagship",
+    badge: "Recommended",
+    schedule: "Every Friday at 5:00 PM IST",
+    description: "Deep-dive digest covering the week's best open-source and model releases.",
+  },
+  {
+    value: "2x_week",
+    label: "2× / week",
+    badge: "Mon & Thu",
+    schedule: "Every Monday & Thursday",
+    description: "Start-of-week and mid-week distilled updates without weekend lag.",
+  },
+  {
+    value: "5x_week",
+    label: "5× / week",
+    badge: "Mon – Fri",
+    schedule: "Monday through Friday (Every Weekday)",
+    description: "Daily weekday radar for active builders and vibe-coders.",
+  },
+  {
+    value: "daily",
+    label: "Daily Morning",
+    badge: "7 Days",
+    schedule: "Every day (Mon – Sun)",
+    description: "Continuous daily stream of freshly processed YouTube technical drops.",
+  },
 ];

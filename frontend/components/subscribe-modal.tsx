@@ -87,14 +87,33 @@ export function SubscribeModal({ children }: SubscribeModalProps) {
           </DialogHeader>
 
           {status === "success" ? (
-            <div className="py-8 text-center flex flex-col items-center">
-              <div className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mb-4 animate-in zoom-in-75 duration-300">
+            <div className="py-6 text-center flex flex-col items-center">
+              <div className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mb-3 animate-in zoom-in-75 duration-300">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="font-heading font-bold text-lg mb-1">You’re on the VIP list</h3>
-              <p className="text-xs text-muted-foreground max-w-xs mb-6">
-                We’ve registered <span className="text-foreground font-medium">{email}</span>. You will receive updates according to your chosen schedule.
+              <h3 className="font-heading font-bold text-lg mb-1">Subscription Confirmed!</h3>
+              <p className="text-xs text-muted-foreground max-w-xs mb-3">
+                A welcome confirmation email has been dispatched to <span className="text-foreground font-semibold">{email}</span>.
               </p>
+              
+              <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/40 text-[11px] font-mono text-foreground/90 w-full text-left space-y-1.5 mb-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Selected Cadence:</span>
+                  <span className="font-semibold text-primary">
+                    {FREQUENCY_OPTIONS.find((o) => o.value === frequency)?.label}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Delivery Days:</span>
+                  <span className="font-semibold text-emerald-500">
+                    {FREQUENCY_OPTIONS.find((o) => o.value === frequency)?.schedule}
+                  </span>
+                </div>
+                <div className="text-[10px] text-muted-foreground border-t border-border/30 pt-1.5 mt-1 font-sans leading-relaxed">
+                  ✓ You will only receive new drops synthesized from today onward — zero duplicate backlog videos.
+                </div>
+              </div>
+
               <Button onClick={() => setOpen(false)} className="rounded-xl px-6 h-10 w-full font-semibold">
                 Done
               </Button>
@@ -133,24 +152,37 @@ export function SubscribeModal({ children }: SubscribeModalProps) {
                 />
               </div>
 
-              {/* Frequency selection buttons */}
+              {/* Frequency selection buttons with clear day schedules */}
               <div className="space-y-2 pt-1">
-                <Label className="text-xs font-semibold">Delivery cadence</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold">Delivery cadence</Label>
+                  <span className="text-[10px] font-mono text-muted-foreground">Select days</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {FREQUENCY_OPTIONS.map((opt) => (
                     <button
                       type="button"
                       key={opt.value}
                       onClick={() => setFrequency(opt.value)}
                       className={cn(
-                        "p-2.5 rounded-xl border text-left transition-all text-xs flex flex-col justify-between",
+                        "p-3 rounded-xl border text-left transition-all text-xs flex flex-col justify-between gap-1.5 cursor-pointer",
                         frequency === opt.value
                           ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-foreground"
                           : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60"
                       )}
                     >
-                      <span className="font-semibold">{opt.label}</span>
-                      <span className="text-[10px] text-muted-foreground line-clamp-1">{opt.description}</span>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-semibold text-foreground">{opt.label}</span>
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-background border border-border/50 text-primary">
+                          {opt.badge}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-emerald-500 font-mono font-medium">
+                        {opt.schedule}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground line-clamp-1 leading-tight">
+                        {opt.description}
+                      </span>
                     </button>
                   ))}
                 </div>

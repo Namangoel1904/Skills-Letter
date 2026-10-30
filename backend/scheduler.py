@@ -1,6 +1,7 @@
 """
 TechPulse Newsletter — APScheduler Background Job
-Runs the newsletter generation pipeline on a configurable cron schedule.
+Runs the newsletter generation pipeline on configured schedule days (Mon–Fri at 5:00 PM IST).
+Dispatches new drops only to subscribers matching that day's frequency preference.
 """
 from __future__ import annotations
 
@@ -21,52 +22,54 @@ scheduler = AsyncIOScheduler(timezone=settings.scheduler_timezone)
 
 
 async def _run_scheduled_generation():
-    """Wrapped async job called by APScheduler."""
-    logger.info("⏰ Scheduled newsletter generation starting...")
+    """
+    Automated generation run:
+    1. Checks for newly uploaded videos in YouTube playlists
+    2. Synthesizes an edition if new drops exist
+    3. Dispatches only to subscribers eligible for today's cadence
+    """
+    logger.info("⏰ Scheduled newsletter generation cycle starting...")
     async with AsyncSessionLocal() as session:
-        edition = await generate_newsletter(db=session, send_email=True)
-        if edition:
-            logger.info(f"✅ Scheduled generation complete — Edition #{edition.edition_number}")
-        else:
-            logger.info("ℹ️ No new videos this cycle")
+        try:
+            edition = await generate_newsletter(db=session, send_email=True)
+            if edition:
+                logger.info(f"✅ Scheduled dispatch complete — Edition #{edition.edition_number} sent to {edition.recipients_count} subscribers")
+            else:
+                logger.info("ℹ️ No new videos detected in playlists this cycle — skipping dispatch")
+        except Exception as e:
+            logger.error(f"❌ Scheduled newsletter generation failed: {e}", exc_info=True)
 
 
 def start_scheduler():
-    """Register the cron job and start the scheduler."""
-    # Parse the cron expression: "30 11 * * 5" = Every Friday 11:30 UTC (5PM IST)
-    cron_parts = settings.newsletter_cron_default.split()
-    if len(cron_parts) == 5:
-        minute, hour, day, month, day_of_week = cron_parts
-        trigger = CronTrigger(
-            minute=minute,
-            hour=hour,
-            day=day,
-            month=month,
-            day_of_week=day_of_week,
-            timezone=settings.scheduler_timezone,
-        )
-    else:
-        # Fallback: every Friday at 5PM IST
-        trigger = CronTrigger(
-            day_of_week="fri",
-            hour=17,
-            minute=0,
-            timezone=settings.scheduler_timezone,
-        )
+    """
+    Register the automated schedule and start the engine.
+    Runs every weekday (Mon–Fri) at 17:00 IST (11:30 UTC):
+    - Monday: dispatches to daily, 5x/week, and 2x/week subscribers
+    - Tuesday & Wednesday: dispatches to daily and 5x/week subscribers
+    - Thursday: dispatches to daily, 5x/week, and 2x/week subscribers
+    - Friday: dispatches to daily, 5x/week, and weekly flagship subscribers
+    """
+    # Mon–Fri at 5:00 PM IST (11:30 UTC)
+    trigger = CronTrigger(
+        day_of_week="mon-fri",
+        hour=17,
+        minute=0,
+        timezone=settings.scheduler_timezone,
+    )
 
     scheduler.add_job(
         _run_scheduled_generation,
         trigger=trigger,
         id="newsletter_generation",
-        name="TechPulse Newsletter Generation",
+        name="TechPulse Weekday Generation Cycle",
         replace_existing=True,
-        misfire_grace_time=3600,  # 1 hour tolerance for misfires
+        misfire_grace_time=3600,
     )
 
     scheduler.start()
     logger.info(
-        f"📅 Scheduler started — cron: {settings.newsletter_cron_default} "
-        f"({settings.scheduler_timezone})"
+        f"📅 Scheduler started — Active Mon–Fri at 17:00 {settings.scheduler_timezone} "
+        "(Mon, Thu: 2x/wk | Mon–Fri: 5x/wk | Fri: Weekly | Daily: all)"
     )
 
 
