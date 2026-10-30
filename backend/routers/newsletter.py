@@ -52,3 +52,23 @@ async def get_edition(edition_id: int, db: AsyncSession = Depends(get_session)):
     if not edition:
         raise HTTPException(status_code=404, detail="Edition not found")
     return edition
+
+
+@router.get("/items/{video_id}")
+async def get_item(video_id: str, db: AsyncSession = Depends(get_session)):
+    """Find a specific video item across editions and return its full detail."""
+    result = await db.exec(
+        select(NewsletterEdition).order_by(NewsletterEdition.edition_number.desc())
+    )
+    editions = result.all()
+    for edition in editions:
+        for v in (edition.videos or []):
+            if v.get("video_id") == video_id:
+                return {
+                    "item": v,
+                    "edition_id": edition.id,
+                    "edition_number": edition.edition_number,
+                    "edition_title": edition.title,
+                    "edition_date": edition.generated_at,
+                }
+    raise HTTPException(status_code=404, detail="Item not found")

@@ -174,10 +174,23 @@ export default async function HomePage() {
                     {/* Item Title & Direct Links */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">
                       <h3 className="font-heading font-bold text-base sm:text-lg text-foreground leading-snug">
-                        {item.title}
+                        <Link
+                          href={`/drop/${item.video_id}`}
+                          className="hover:text-primary transition-colors"
+                        >
+                          {item.title}
+                        </Link>
                       </h3>
 
                       <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                        <Link
+                          href={`/drop/${item.video_id}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
+                        >
+                          <span>Breakdown</span>
+                          <ArrowUpRight className="w-3 h-3" />
+                        </Link>
+
                         {item.repo_links && item.repo_links.length > 0 && (
                           <a
                             href={item.repo_links[0]}
@@ -248,15 +261,13 @@ export default async function HomePage() {
                         ))}
                       </div>
 
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-foreground inline-flex items-center gap-1 font-mono transition-colors opacity-70 hover:opacity-100"
+                      <Link
+                        href={`/drop/${item.video_id}`}
+                        className="text-primary hover:text-primary/80 inline-flex items-center gap-1 font-mono transition-colors font-semibold"
                       >
-                        <span>source technical video</span>
+                        <span>Read full breakdown</span>
                         <ArrowUpRight className="w-3 h-3" />
-                      </a>
+                      </Link>
                     </div>
                   </article>
                 ))}

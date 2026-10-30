@@ -71,6 +71,18 @@ export async function getEdition(id: number): Promise<NewsletterEdition> {
   return apiFetch<NewsletterEdition>(`/api/newsletter/editions/${id}`);
 }
 
+export interface DropDetail {
+  item: VideoSummary;
+  edition_id: number;
+  edition_number: number;
+  edition_title: string;
+  edition_date: string;
+}
+
+export async function getDropDetail(videoId: string): Promise<DropDetail> {
+  return apiFetch<DropDetail>(`/api/newsletter/items/${videoId}`);
+}
+
 // ── Subscribers ───────────────────────────────────────────────────────────
 
 export async function subscribe(payload: SubscribePayload): Promise<{ id: number; email: string }> {
