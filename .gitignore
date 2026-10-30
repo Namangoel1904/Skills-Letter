@@ -1,0 +1,54 @@
+# Environment variables (CRITICAL: Do NOT commit secrets)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python
+backend/.venv/
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / Next.js
+frontend/node_modules/
+node_modules/
+frontend/.next/
+.next/
+frontend/out/
+out/
+frontend/build/
+build/
+.pnpm-store/
+frontend/.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Database & SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Copied session brain / transcripts (local machine only)
+6e51ba1f-632d-4a39-bb05-71ec0a978556*

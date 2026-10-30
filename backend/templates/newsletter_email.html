@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <title>{{ edition.title }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; padding: 0; background: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif; -webkit-text-size-adjust: 100%; }
+    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
+    img { border: 0; outline: none; text-decoration: none; max-width: 100%; }
+    a { color: inherit; }
+
+    /* ── Typography ── */
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+    h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.3; margin: 32px 0 12px; }
+    h3 { font-size: 16px; font-weight: 600; line-height: 1.4; margin: 20px 0 8px; }
+    p  { font-size: 15px; line-height: 1.7; margin: 0 0 16px; }
+    ul { padding-left: 20px; margin: 8px 0 16px; }
+    li { font-size: 14px; line-height: 1.6; margin-bottom: 6px; }
+    code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 13px; background: rgba(99,102,241,0.15); padding: 2px 6px; border-radius: 4px; color: #a5b4fc; }
+    blockquote { border-left: 3px solid #6366f1; padding-left: 16px; margin: 16px 0; color: #94a3b8; font-style: italic; }
+    hr { border: none; border-top: 1px solid #1e1e2e; margin: 28px 0; }
+    strong { font-weight: 600; color: #e2e8f0; }
+    em { color: #94a3b8; font-style: italic; }
+
+    /* ── Links ── */
+    a.link { color: #818cf8; text-decoration: none; border-bottom: 1px solid rgba(129,140,248,0.3); }
+    a.link:hover { color: #a5b4fc; border-color: #a5b4fc; }
+
+    /* ── Tag pills ── */
+    .tag { display: inline-block; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); color: #818cf8; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 3px 4px 0; }
+
+    /* ── Section header ── */
+    .section-header { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #1e1e2e; margin-bottom: 20px; }
+    .section-icon { font-size: 20px; }
+    .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; }
+
+    /* ── Video card ── */
+    .video-card { background: #111118; border: 1px solid #1e1e2e; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+    .video-card-title { font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+    .video-card-channel { font-size: 12px; color: #475569; margin-bottom: 12px; }
+    .video-card-tldr { font-size: 14px; color: #94a3b8; line-height: 1.5; margin-bottom: 12px; font-style: italic; }
+    .video-card-points { margin: 0; padding-left: 0; list-style: none; }
+    .video-card-points li { font-size: 13px; color: #cbd5e1; line-height: 1.5; padding: 4px 0 4px 20px; position: relative; }
+    .video-card-points li::before { content: "→"; position: absolute; left: 0; color: #6366f1; font-weight: 700; }
+
+    @media (max-width: 600px) {
+      .email-body { padding: 16px !important; }
+      h1 { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+  <tr>
+    <td align="center" style="padding: 40px 16px; background: #0a0a0f;">
+
+      <!-- ── Container ── -->
+      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px; width:100%;">
+
+        <!-- ── Header / Logo ── -->
+        <tr>
+          <td style="padding-bottom: 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <!-- Wordmark -->
+                  <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">
+                    Tech<span style="color: #6366f1;">Pulse</span>
+                  </span>
+                  <span style="font-size: 11px; font-weight: 600; color: #475569; letter-spacing: 2px; text-transform: uppercase; margin-left: 10px; vertical-align: middle;">Newsletter</span>
+                </td>
+                <td align="right">
+                  <span style="font-size: 11px; color: #334155; font-weight: 500;">
+                    Edition #{{ edition.edition_number }}
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Hero ── -->
+        <tr>
+          <td style="background: linear-gradient(135deg, #0f0f1a 0%, #13131f 50%, #0f0f1a 100%); border: 1px solid #1e1e2e; border-radius: 16px; padding: 36px 40px; margin-bottom: 32px;">
+            <!-- Edition label -->
+            <div style="display: inline-block; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); border-radius: 999px; padding: 4px 14px; margin-bottom: 20px;">
+              <span style="font-size: 11px; font-weight: 700; color: #818cf8; letter-spacing: 1px; text-transform: uppercase;">
+                ⚡ {{ edition.generated_at.strftime('%B %d, %Y') if edition.generated_at else 'This Week' }}
+              </span>
+            </div>
+            <h1 style="color: #f1f5f9; margin-bottom: 12px;">{{ edition.title }}</h1>
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
+              {{ edition.video_count }} hand-picked videos · AI-summarised for you
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── Spacer ── -->
+        <tr><td style="height: 32px;"></td></tr>
+
+        <!-- ── Main Content ── -->
+        <tr>
+          <td class="email-body" style="padding: 0;">
+            {{ content_html | safe }}
+          </td>
+        </tr>
+
+        <!-- ── Divider ── -->
+        <tr><td style="height: 40px; border-top: 1px solid #1e1e2e; margin-top: 40px;"></td></tr>
+
+        <!-- ── CTA Banner ── -->
+        <tr>
+          <td style="background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px; padding: 28px 32px; text-align: center; margin: 8px 0;">
+            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 16px;">Know someone who'd love this?</p>
+            <a href="{{ frontend_url }}" style="display: inline-block; background: #6366f1; color: #ffffff; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 8px; text-decoration: none; letter-spacing: 0.3px;">
+              Share TechPulse →
+            </a>
+          </td>
+        </tr>
+
+        <!-- ── Footer ── -->
+        <tr>
+          <td style="padding: 32px 0 8px; text-align: center;">
+            <p style="font-size: 12px; color: #334155; margin-bottom: 8px;">
+              You're receiving this because you subscribed to TechPulse.
+            </p>
+            <p style="font-size: 12px; color: #334155; margin: 0;">
+              <a href="{{ unsubscribe_url }}" style="color: #475569; text-decoration: underline;">Unsubscribe</a>
+              &nbsp;·&nbsp;
+              <a href="{{ frontend_url }}" style="color: #475569; text-decoration: underline;">View online</a>
+              &nbsp;·&nbsp;
+              © {{ year }} TechPulse
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── Bottom spacing ── -->
+        <tr><td style="height: 40px;"></td></tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

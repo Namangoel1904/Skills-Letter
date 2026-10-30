@@ -1,0 +1,36 @@
+# Web Framework
+fastapi==0.115.5
+uvicorn[standard]==0.32.0
+
+# Database - PostgreSQL (Render-compatible)
+sqlmodel==0.0.22
+asyncpg==0.30.0
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# Google AI + YouTube
+google-genai>=2.30.1
+google-api-python-client==2.154.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.1
+
+# Scheduler
+apscheduler==3.10.4
+
+# Email
+resend>=2.5.1
+
+# Templating (email HTML)
+jinja2==3.1.4
+markdown==3.7
+
+# Utilities
+python-dotenv==1.0.1
+httpx>=0.28.1
+pydantic-settings>=2.6.1
+pydantic[email]>=2.12.5
+python-multipart==0.0.17
+aiofiles==24.1.0
+
+# CORS
+# (built into fastapi)
