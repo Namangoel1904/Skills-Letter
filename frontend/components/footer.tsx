@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Terminal, Youtube, Github, Twitter } from "lucide-react";
+import { Sparkles, Terminal, Youtube, Github, Twitter, Shield } from "lucide-react";
 
 export function Footer() {
   return (
@@ -23,6 +23,10 @@ export function Footer() {
           </Link>
           <Link href="/archive" className="hover:text-foreground transition-colors">
             Archive
+          </Link>
+          <Link href="/admin" className="hover:text-primary transition-colors flex items-center gap-1 font-mono">
+            <Shield className="w-3 h-3 text-primary" />
+            Console
           </Link>
           <a
             href="https://youtube.com"

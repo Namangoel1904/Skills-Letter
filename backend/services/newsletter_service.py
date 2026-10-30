@@ -35,11 +35,12 @@ settings = get_settings()
 async def generate_newsletter(
     db: AsyncSession,
     send_email: bool = True,
+    allow_reprocess: bool = False,
 ) -> Optional[NewsletterEdition]:
     """
     Full newsletter generation pipeline:
     1. Fetch new videos from all configured playlists
-    2. Skip already-processed videos
+    2. Skip already-processed videos (unless allow_reprocess=True)
     3. Get transcripts (YouTube API → Gemini URL fallback)
     4. Summarize each video with Gemini 3.8 Flash
     5. Compose full newsletter markdown
@@ -74,7 +75,13 @@ async def generate_newsletter(
         )
         new_videos = [v for v in videos if v["video_id"] not in already_processed]
         logger.info(f"  Found {len(videos)} videos, {len(new_videos)} new")
-        all_videos.extend(new_videos)
+        
+        if allow_reprocess and not new_videos and videos:
+            logger.info("  [Testing Mode] allow_reprocess=True, including existing playlist videos")
+            all_videos.extend(videos)
+        else:
+            all_videos.extend(new_videos)
+
         if playlist_id not in playlist_ids_used:
             playlist_ids_used.append(playlist_id)
 
@@ -145,15 +152,16 @@ async def generate_newsletter(
     db.add(edition)
     await db.flush()  # get edition.id
 
-    # Mark videos as processed
+    # Mark videos as processed (avoid duplicate primary keys if reprocessed)
     for summary in summaries:
-        db.add(
-            ProcessedVideo(
-                video_id=summary["video_id"],
-                edition_id=edition.id,
-                source_playlist=summary.get("source_playlist", ""),
+        if summary["video_id"] not in already_processed:
+            db.add(
+                ProcessedVideo(
+                    video_id=summary["video_id"],
+                    edition_id=edition.id,
+                    source_playlist=summary.get("source_playlist", ""),
+                )
             )
-        )
 
     await db.commit()
     await db.refresh(edition)

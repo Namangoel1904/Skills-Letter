@@ -100,6 +100,116 @@ export async function getSubscriberCount(): Promise<{ count: number }> {
   return apiFetch("/api/subscribers/count");
 }
 
+// ── Admin Console ─────────────────────────────────────────────────────────
+
+export interface WorkerStatus {
+  status: string;
+  latency_ms?: number;
+  quota_used?: number;
+  quota_total?: number;
+  model?: string;
+  fallback?: string;
+  schedule?: string;
+  schedule_detail?: string;
+  from_email?: string;
+  from_name?: string;
+  active_subscribers?: number;
+}
+
+export interface EditionHistoryItem {
+  id: number;
+  edition_number: number;
+  title: string;
+  generated_at: string;
+  sent_at?: string;
+  status: "draft" | "sent" | "failed";
+  video_count: number;
+  recipients_count: number;
+  word_count: number;
+  playlist_count: number;
+}
+
+export interface AdminDashboardData {
+  audience: {
+    total_subscribers: number;
+    recent_growth_7d: number;
+    frequency_breakdown: Record<string, number>;
+    open_rate_est: number;
+    ctr_est: number;
+  };
+  pipeline: {
+    next_edition_number: number;
+    total_editions: number;
+    total_processed_videos: number;
+    cron_expression: string;
+    cron_timezone: string;
+    cron_human: string;
+    cron_active: boolean;
+    playlist_ids: string[];
+    playlist_names: string[];
+    lookback_days: number;
+    max_videos_per_edition: number;
+  };
+  workers: {
+    youtube_api: WorkerStatus;
+    gemini: WorkerStatus;
+    cron_engine: WorkerStatus;
+    resend: WorkerStatus;
+  };
+  history: EditionHistoryItem[];
+}
+
+export async function adminLogin(password: string): Promise<{ authenticated: boolean; token: string; expires_in: number }> {
+  return apiFetch("/api/admin/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+}
+
+export async function verifyAdminToken(token: string): Promise<{ authenticated: boolean; role: string }> {
+  return apiFetch("/api/admin/auth/verify", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function getAdminDashboard(token: string): Promise<AdminDashboardData> {
+  return apiFetch<AdminDashboardData>("/api/admin/dashboard", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+}
+
+export async function triggerGeneration(
+  token: string,
+  payload: { send_email: boolean; allow_reprocess: boolean }
+): Promise<{
+  success: boolean;
+  message: string;
+  edition_id?: number;
+  edition_number?: number;
+  title?: string;
+  video_count?: number;
+  status?: string;
+  recipients_count?: number;
+  duration_seconds?: number;
+}> {
+  return apiFetch("/api/admin/generate", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function broadcastEdition(
+  token: string,
+  editionId: number
+): Promise<{ success: boolean; message: string; edition_number: number; recipients_count: number }> {
+  return apiFetch(`/api/admin/editions/${editionId}/broadcast`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 // ── Utils ─────────────────────────────────────────────────────────────────
 
 export function formatDuration(seconds: number): string {

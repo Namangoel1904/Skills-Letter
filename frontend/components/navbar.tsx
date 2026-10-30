@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Sparkles, Terminal, BellRing, ArrowUpRight } from "lucide-react";
+import { Sun, Moon, Sparkles, Terminal, BellRing, ArrowUpRight, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SubscribeModal } from "@/components/subscribe-modal";
@@ -68,6 +68,13 @@ export function Navbar() {
             GitHub Gems
             <ArrowUpRight className="w-3 h-3 opacity-60" />
           </a>
+          <Link
+            href="/admin"
+            className="px-3.5 py-1.5 rounded-full hover:text-primary hover:bg-background/50 transition-all inline-flex items-center gap-1.5 font-mono text-[11px] text-foreground/80 font-semibold"
+          >
+            <Shield className="w-3 h-3 text-primary" />
+            Console
+          </Link>
         </nav>
 
         {/* Right actions */}
