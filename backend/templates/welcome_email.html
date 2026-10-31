@@ -4,93 +4,229 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="x-apple-disable-message-reformatting" />
-  <title>Welcome to Notified</title>
+  <title>NOTIFIED · Subscription Confirmed</title>
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
   <style>
+    /* Reset & Base Styles */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { margin: 0; padding: 0; background: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif; -webkit-text-size-adjust: 100%; color: #cbd5e1; }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f3ee;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      color: #1a1a1a;
+    }
     table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
     img { border: 0; outline: none; text-decoration: none; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
-    h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; color: #f8fafc; }
-    p { font-size: 14px; line-height: 1.7; color: #94a3b8; margin: 0 0 16px; }
+
+    /* Editorial Typography */
+    .serif-masthead {
+      font-family: 'Playfair Display', Didot, 'Bodoni MT', 'Times New Roman', Georgia, serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .serif-title {
+      font-family: 'Playfair Display', Didot, Georgia, 'Times New Roman', serif;
+      font-weight: 800;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+    .serif-quote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+    }
+    .mono-meta {
+      font-family: 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+      text-transform: uppercase;
+    }
+
+    /* Responsive Grid */
+    @media screen and (max-width: 620px) {
+      .mag-outer-pad { padding: 16px 8px 36px !important; }
+      .mag-content-cell { padding: 22px 16px 28px 16px !important; }
+      .masthead-title { font-size: 38px !important; }
+      .dossier-col { display: block !important; width: 100% !important; padding-bottom: 12px !important; }
+    }
+
+    /* Dark Mode Overrides for Mail Clients */
+    @media (prefers-color-scheme: dark) {
+      body, .canvas-bg { background-color: #09090d !important; }
+      .mag-card-sheet { background-color: #111116 !important; border-color: #242430 !important; box-shadow: none !important; }
+      .mag-content-cell { background-color: #111116 !important; }
+      .serif-masthead { color: #ffffff !important; }
+      .serif-title { color: #f8fafc !important; }
+      .mag-rule-black { border-color: #38384a !important; }
+      .mag-rule-subtle { border-color: #22222e !important; }
+      .mag-rule-double { border-top-color: #38384a !important; border-bottom-color: #38384a !important; }
+      .body-muted { color: #94a3b8 !important; }
+      .dossier-box { background-color: #151522 !important; border-color: #262638 !important; }
+      .dossier-label { color: #818cf8 !important; }
+      .dossier-val { color: #f1f5f9 !important; }
+      .pullquote-box { background-color: #161622 !important; border-left-color: #6366f1 !important; }
+      .pullquote-text { color: #cbd5e1 !important; }
+      .action-pill-black { background-color: #4f46e5 !important; color: #ffffff !important; }
+      .footer-box { background-color: #151520 !important; border-color: #272738 !important; }
+    }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background: #0a0a0f;">
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<body style="margin: 0; padding: 0; background-color: #f4f3ee;">
+<!-- Invisible Preview Text for Mail Inboxes -->
+<div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f4f3ee;">
+  Subscription Confirmed: Welcome to Notified · BeingNotified Skill Letter. Your verified engineering dispatch is active.
+  &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  OUTER CANVAS WRAPPER                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="canvas-bg" style="background-color: #f4f3ee;">
   <tr>
-    <td align="center" style="padding: 40px 16px; background: #0a0a0f;">
+    <td align="center" class="mag-outer-pad" style="padding: 40px 18px 56px;">
 
-      <!-- Container -->
-      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; width: 100%;">
-
-        <!-- Header / Logo -->
+      <!-- ══════════════════════════════════════════════════════════════════ -->
+      <!--  MAIN MAGAZINE CONTAINER CARD (Max 640px)                         -->
+      <!-- ══════════════════════════════════════════════════════════════════ -->
+      <table width="640" cellpadding="0" cellspacing="0" role="presentation" class="mag-card-sheet" style="max-width: 640px; width: 100%; background-color: #ffffff; border: 1px solid #dfddd5; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); overflow: hidden;">
         <tr>
-          <td style="padding-bottom: 28px;">
-            <table width="100%" cellpadding="0" cellspacing="0">
+          <!-- ── MASTER CELL: 36px LEFT & RIGHT MARGINS ── -->
+          <td class="mag-content-cell" style="padding: 38px 36px 40px 36px; background-color: #ffffff;">
+
+            <!-- ── Top Metadata Bar (Double Rule) ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="mag-rule-double" style="border-top: 3px solid #111111; border-bottom: 1px solid #111111; padding: 8px 0; margin-bottom: 24px;">
               <tr>
-                <td>
-                  <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">
-                    Notified<span style="color: #6366f1;">.</span>
-                  </span>
-                  <span style="font-size: 10px; font-weight: 700; color: #6366f1; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); border-radius: 999px; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; margin-left: 8px; vertical-align: middle;">
-                    Subscription Confirmed
+                <td align="left" valign="middle">
+                  <span class="mono-meta" style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #4338ca; background-color: #eef2ff; border: 1px solid #c7d2fe; padding: 3px 9px; border-radius: 999px;">
+                    CONFIRMATION DOSSIER
                   </span>
                 </td>
-                <td align="right">
-                  <span style="font-size: 11px; font-family: monospace; color: #475569;">
-                    BeingNotified / Skills Letter
+                <td align="center" valign="middle">
+                  <span class="mono-meta body-muted" style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #64748b;">
+                    BEINGNOTIFIED / SKILL LETTER
+                  </span>
+                </td>
+                <td align="right" valign="middle">
+                  <span class="mono-meta body-muted" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #10b981;">
+                    ● ACTIVE
                   </span>
                 </td>
               </tr>
             </table>
-          </td>
-        </tr>
 
-        <!-- Hero Card -->
-        <tr>
-          <td style="background: linear-gradient(135deg, #0f0f1a 0%, #131326 50%, #0f0f1a 100%); border: 1px solid #1e1e32; border-radius: 20px; padding: 36px 36px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
-            
-            <!-- Greeting badge -->
-            <div style="display: inline-block; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 999px; padding: 4px 14px; margin-bottom: 20px;">
-              <span style="font-size: 11px; font-weight: 700; color: #10b981; letter-spacing: 0.5px; text-transform: uppercase;">
-                ✓ Official VIP Member
-              </span>
-            </div>
-
-            <h1 style="margin-bottom: 16px;">
-              Welcome to the Dispatch, {{ subscriber.name or 'Builder' }}!
-            </h1>
-
-            <p style="font-size: 15px; color: #cbd5e1; line-height: 1.7; margin-bottom: 24px;">
-              Your subscription is officially active. You have bypassed algorithmic noise to receive pure signal: breakthrough open-source repositories, local model checkpoints, and vibe-coding tools distilled straight from technical sessions.
-            </p>
-
-            <!-- Schedule Card -->
-            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background: #151522; border: 1px solid #27273a; border-radius: 14px; padding: 20px; margin-bottom: 28px;">
+            <!-- ── Magazine Editorial Masthead ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 24px;">
               <tr>
-                <td style="padding: 16px 20px;">
-                  <table width="100%" cellpadding="0" cellspacing="0">
+                <td align="center" style="padding: 8px 0 16px;">
+                  <h1 class="serif-masthead masthead-title" style="margin: 0; font-size: 48px; font-weight: 900; letter-spacing: 4px; line-height: 1.05; color: #111111;">
+                    NOTIFIED
+                  </h1>
+                  <p class="mono-meta body-muted" style="margin: 8px 0 0; font-size: 10.5px; font-weight: 800; letter-spacing: 2.5px; color: #475569;">
+                    THE CHRONICLE OF OPEN SOURCE, LOCAL AI &amp; VIBE CODING
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="mag-rule-black" style="border-top: 2px solid #111111; width: 100%; height: 1px;"></div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- ── Editorial Welcome Letter ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 28px;">
+              <tr>
+                <td style="padding: 10px 0 0;">
+                  <span class="mono-meta" style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #4338ca;">
+                    FROM THE DESK OF THE EDITORIAL LEAD
+                  </span>
+                  <h2 class="serif-title" style="margin: 10px 0 14px; font-size: 26px; font-weight: 800; line-height: 1.25; color: #111111;">
+                    SUBSCRIPTION CONFIRMED. WELCOME, {{ (subscriber.name or 'ENGINEER') | upper }}.
+                  </h2>
+                  <p class="body-muted" style="font-size: 14.5px; line-height: 1.75; color: #334155; margin: 0 0 16px;">
+                    You have officially severed ties with the YouTube algorithmic doom-scroll. While thousands of developers spend dozens of hours trapped in video rabbit holes, our editorial engineering desk watches, verifies, and distills 100+ weekly technical releases, production GitHub repositories, and local quantized LLM weights into verified 4-minute digests.
+                  </p>
+                  <p class="body-muted" style="font-size: 14px; line-height: 1.7; color: #475569; margin: 0;">
+                    Zero clickbait, zero fluff, zero sponsored padding. Only pure, reproducible code and weights delivered strictly on your chosen schedule.
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- ── Member Specification Dossier (Technical Docket Box) ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="dossier-box" style="margin-bottom: 28px; background-color: #fafaf7; border: 1px solid #e5e3db; border-radius: 8px; padding: 22px 24px;">
+              <tr>
+                <td colspan="2" style="padding-bottom: 14px; border-bottom: 1px solid #e8e6df;">
+                  <span class="mono-meta" style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #111111;">
+                    MEMBERSHIP SPECIFICATION &amp; DISPATCH DOCKET
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top: 14px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                     <tr>
-                      <td style="padding-bottom: 12px; border-bottom: 1px solid #222234;">
-                        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #818cf8; font-family: monospace;">
-                          Your Delivery Schedule
+                      <td width="38%" valign="top" style="padding: 6px 0;">
+                        <span class="mono-meta dossier-label" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748b;">
+                          MEMBER RECIPIENT
+                        </span>
+                      </td>
+                      <td width="62%" valign="top" style="padding: 6px 0;">
+                        <span class="dossier-val" style="font-size: 13px; font-weight: 700; color: #111111; font-family: monospace;">
+                          {{ subscriber.email }}
                         </span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="padding-top: 14px;">
-                        <p style="font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px;">
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="mono-meta dossier-label" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748b;">
+                          DELIVERY CADENCE
+                        </span>
+                      </td>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="dossier-val" style="font-size: 12.5px; font-weight: 700; color: #4338ca;">
                           {{ frequency_label }}
-                        </p>
-                        <p style="font-size: 13px; color: #10b981; font-weight: 600; font-family: monospace; margin-bottom: 8px;">
-                          📅 {{ delivery_days }}
-                        </p>
-                        <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.5;">
-                          Each issue contains <em>only new technical drops</em> synthesized since your previous issue — no duplicate videos or bloated recaps.
-                        </p>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="mono-meta dossier-label" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748b;">
+                          SCHEDULED DAYS
+                        </span>
+                      </td>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="dossier-val" style="font-size: 12.5px; font-weight: 700; color: #10b981; font-family: monospace;">
+                          {{ delivery_days }}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="mono-meta dossier-label" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748b;">
+                          EDITORIAL RADAR
+                        </span>
+                      </td>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="dossier-val body-muted" style="font-size: 12px; color: #475569;">
+                          {{ delivery_description }}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span class="mono-meta dossier-label" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748b;">
+                          VERIFICATION
+                        </span>
+                      </td>
+                      <td valign="top" style="padding: 6px 0;">
+                        <span style="font-size: 11px; font-weight: 700; color: #10b981; background-color: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; font-family: monospace;">
+                          ✓ 100% Verified Subscriber
+                        </span>
                       </td>
                     </tr>
                   </table>
@@ -98,46 +234,94 @@
               </tr>
             </table>
 
-            <!-- Latest Edition CTA -->
             {% if latest_edition %}
-            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 28px;">
+            <!-- ── Live Issue Spotlight ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 28px; border-top: 1px solid #e5e3db; padding-top: 22px;">
               <tr>
                 <td>
-                  <p style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 10px;">
-                    Want to dive in right now? Check out our latest published dispatch:
+                  <span class="mono-meta" style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #64748b;">
+                    CURRENT DISPATCH ON THE STANDS
+                  </span>
+                  <h3 class="serif-title" style="margin: 8px 0 10px; font-size: 20px; font-weight: 800; color: #111111;">
+                    Issue #{{ latest_edition.edition_number }} — {{ latest_edition.title }}
+                  </h3>
+                  <p class="body-muted" style="font-size: 13px; line-height: 1.65; color: #475569; margin: 0 0 16px;">
+                    Our latest distilled edition covers {{ latest_edition.video_count or 3 }} verified technical releases and open-source models with reproducible links. You can read it immediately on the web:
                   </p>
-                  <table cellpadding="0" cellspacing="0" role="presentation">
-                    <tr>
-                      <td align="center" style="border-radius: 12px; background: #6366f1;">
-                        <a href="{{ frontend_url }}/edition/{{ latest_edition.id }}" target="_blank" style="display: inline-block; padding: 12px 24px; font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px; letter-spacing: 0.3px;">
-                          Read Edition #{{ latest_edition.edition_number }}: {{ latest_edition.title }} →
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
+                  <div>
+                    <a href="{{ frontend_url }}/latest" class="action-pill-black" style="display: inline-block; background-color: #111111; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 700; padding: 10px 22px; border-radius: 999px; text-transform: uppercase; letter-spacing: 1px;">
+                      Read Latest Issue →
+                    </a>
+                  </div>
                 </td>
               </tr>
             </table>
             {% endif %}
 
-            <!-- What to expect bullet points -->
-            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-top: 1px solid #1e1e32; padding-top: 20px;">
+            <!-- ── Whitelist & Deliverability Advisory (Pullquote Box) ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="pullquote-box" style="margin-bottom: 32px; background-color: #f7f6f2; border-left: 4px solid #4338ca; padding: 16px 20px; border-radius: 0 6px 6px 0;">
               <tr>
                 <td>
-                  <p style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-                    What you will receive in every issue:
+                  <p class="mono-meta" style="font-size: 9.5px; font-weight: 800; letter-spacing: 1.5px; color: #4338ca; margin: 0 0 6px;">
+                    CRITICAL ADVISORY · INBOX DELIVERABILITY
                   </p>
-                  <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">
-                    🛠 <strong>Open Source Codebases</strong> — Direct GitHub repo links with setup notes
+                  <p class="pullquote-text" style="font-size: 12.5px; line-height: 1.6; color: #334155; margin: 0;">
+                    To guarantee you never miss a drop: <strong>move this email to your Primary tab</strong> or reply with a quick "received". This teaches mail algorithms that you want verified engineering signal instead of algorithmic promotional junk.
                   </p>
-                  <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">
-                    🤖 <strong>Local AI Models</strong> — Quantized GGUF/Ollama weights you can run locally
+                </td>
+              </tr>
+            </table>
+
+            <!-- ── Editorial Sign-off ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 28px;">
+              <tr>
+                <td>
+                  <p class="serif-quote body-muted" style="font-size: 15px; line-height: 1.7; color: #475569; margin: 0 0 12px;">
+                    "The future belongs to engineers who build with verified local models, open source codebases, and vibe-coding tools."
                   </p>
-                  <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">
-                    ✨ <strong>Cursor & Claude Prompts</strong> — AntiGravity rules and vibe-coding skills
+                  <p class="mono-meta" style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #111111; margin: 0;">
+                    — THE EDITORIAL DESK, BEINGNOTIFIED · SKILL LETTER
                   </p>
-                  <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 0;">
-                    🎯 <strong>Dedicated Drop Pages</strong> — Full unclipped takeaways with zero algorithmic fluff
+                </td>
+              </tr>
+            </table>
+
+            <!-- ── Magazine Footer ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="mag-rule-double" style="border-top: 2px solid #111111; border-bottom: 1px solid #111111; padding: 16px 0; margin-bottom: 20px;">
+              <tr>
+                <td align="left" valign="middle">
+                  <span class="mono-meta" style="font-size: 11px; font-weight: 900; letter-spacing: 2px; color: #111111;">
+                    SKILL LETTER
+                  </span>
+                  <span class="mono-meta body-muted" style="font-size: 9.5px; color: #64748b; margin-left: 8px;">
+                    EST. 2026
+                  </span>
+                </td>
+                <td align="right" valign="middle">
+                  <span class="mono-meta body-muted" style="font-size: 9.5px; letter-spacing: 1px; color: #64748b;">
+                    VERIFIED ENGINEERING TELEMETRY
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- ── Legal / Unsubscribe / Preferences Bar ── -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+              <tr>
+                <td align="center">
+                  <p class="body-muted" style="font-size: 11px; line-height: 1.6; color: #64748b; margin: 0 0 10px;">
+                    You received this confirmation because you subscribed with <span style="font-family: monospace; color: #334155;">{{ subscriber.email }}</span>.
+                    You can change your delivery cadence or opt out at any time.
+                  </p>
+                  <p class="mono-meta" style="font-size: 10px; font-weight: 700; letter-spacing: 1px; margin: 0;">
+                    <a href="{{ frontend_url }}/latest" style="color: #4338ca; text-decoration: underline;">LATEST DISPATCH</a>
+                    &nbsp;&nbsp;·&nbsp;&nbsp;
+                    <a href="{{ frontend_url }}/archive" style="color: #4338ca; text-decoration: underline;">ISSUE ARCHIVE</a>
+                    &nbsp;&nbsp;·&nbsp;&nbsp;
+                    <a href="{{ unsubscribe_url }}" style="color: #dc2626; text-decoration: underline;">UNSUBSCRIBE</a>
+                  </p>
+                  <p class="body-muted" style="font-size: 10px; color: #94a3b8; margin: 12px 0 0;">
+                    © {{ year }} BeingNotified · Skill Letter. All rights reserved. Zero spam. 100% verified signal.
                   </p>
                 </td>
               </tr>
@@ -145,29 +329,11 @@
 
           </td>
         </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="padding: 28px 16px; text-align: center;">
-            <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">
-              Sent to <strong style="color: #64748b;">{{ subscriber.email }}</strong> because you subscribed to Notified.
-            </p>
-            <p style="font-size: 11px; color: #334155; margin: 0;">
-              <a href="{{ frontend_url }}" style="color: #6366f1; text-decoration: underline;">Web Home</a>
-              &nbsp;·&nbsp;
-              <a href="{{ unsubscribe_url }}" style="color: #64748b; text-decoration: underline;">Unsubscribe / Manage Preferences</a>
-            </p>
-            <p style="font-size: 10px; color: #1e293b; font-family: monospace; margin-top: 12px;">
-              © {{ year }} Notified. All rights reserved.
-            </p>
-          </td>
-        </tr>
-
       </table>
 
     </td>
   </tr>
 </table>
+
 </body>
 </html>
-
