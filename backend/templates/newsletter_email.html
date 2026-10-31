@@ -582,7 +582,7 @@
               
               <!-- Footer Masthead Insignia -->
               <tr>
-                <td align="center" style="padding-bottom: 12px;">
+                <td align="center" style="padding-bottom: 14px;">
                   <span class="serif-masthead" style="font-size: 18px; font-weight: 900; letter-spacing: 2.5px; color: #0a0a0a;">
                     TECH<span style="color: #4f46e5;">PULSE</span> JOURNAL
                   </span>
@@ -592,47 +592,23 @@
                 </td>
               </tr>
 
-              <!-- Subscriber Recipient & Cadence Status Badge -->
-              <tr>
-                <td align="center" style="padding-bottom: 16px;">
-                  <table cellpadding="0" cellspacing="0" role="presentation" class="footer-badge-box" style="background-color: #ffffff; border: 1px solid #e0ded8; border-radius: 6px; padding: 8px 16px;">
-                    <tr>
-                      <td align="center">
-                        <span class="mono-meta" style="font-size: 10px; color: #64748b;">
-                          Delivered to: <strong style="color: #111111;">{{ subscriber_email or 'Subscribed Member' }}</strong>
-                        </span>
-                        <span style="color: #cbd5e1; margin: 0 6px;">·</span>
-                        <span class="mono-meta" style="font-size: 10px; color: #4338ca; font-weight: 800;">
-                          {{ subscriber_frequency_label or 'Curated Dispatch' }}
-                        </span>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
               <!-- Quick Navigation Buttons Row -->
               <tr>
                 <td align="center" style="padding-bottom: 18px;">
                   <table cellpadding="0" cellspacing="0" role="presentation" class="footer-btn-table">
                     <tr>
-                      <td style="padding: 0 4px;">
-                        <a href="{{ frontend_url }}" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #1e293b; border: 1px solid #d5d3cb; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; text-decoration: none;">
+                      <td style="padding: 0 5px;">
+                        <a href="{{ frontend_url }}" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #1e293b; border: 1px solid #d5d3cb; padding: 7px 14px; border-radius: 4px; font-size: 10.5px; font-weight: 700; text-decoration: none;">
                           🌐 Web Home
                         </a>
                       </td>
-                      <td style="padding: 0 4px;">
-                        <a href="{{ frontend_url }}/archive" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #1e293b; border: 1px solid #d5d3cb; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; text-decoration: none;">
+                      <td style="padding: 0 5px;">
+                        <a href="{{ frontend_url }}/archive" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #1e293b; border: 1px solid #d5d3cb; padding: 7px 14px; border-radius: 4px; font-size: 10.5px; font-weight: 700; text-decoration: none;">
                           📚 Archive
                         </a>
                       </td>
-                      <td style="padding: 0 4px;">
-                        <a href="{{ unsubscribe_url }}" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #1e293b; border: 1px solid #d5d3cb; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; text-decoration: none;">
-                          ⚙️ Cadence
-                        </a>
-                      </td>
-                      <td style="padding: 0 4px;">
-                        <a href="{{ unsubscribe_url }}" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #dc2626; border: 1px solid #fecaca; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; text-decoration: none;">
+                      <td style="padding: 0 5px;">
+                        <a href="{{ unsubscribe_url }}" target="_blank" class="footer-nav-btn mono-meta" style="display: inline-block; background-color: #ffffff; color: #dc2626; border: 1px solid #fecaca; padding: 7px 14px; border-radius: 4px; font-size: 10.5px; font-weight: 700; text-decoration: none;">
                           ✕ Unsubscribe
                         </a>
                       </td>
