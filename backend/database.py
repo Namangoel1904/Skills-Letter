@@ -15,9 +15,16 @@ import models  # Ensure all SQLModel tables are registered before create_all
 
 settings = get_settings()
 
+# Normalize database URL for asyncpg on Render / cloud providers
+db_url = (settings.database_url or "").strip()
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+asyncpg://"):
+    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 # Create async engine (PostgreSQL via asyncpg)
 engine: AsyncEngine = create_async_engine(
-    settings.database_url,
+    db_url,
     echo=False,
     pool_pre_ping=True,
     pool_size=5,

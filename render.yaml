@@ -1,0 +1,67 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Render Blueprint Specification — BeingNotified Skill Letter
+#  Deploys PostgreSQL Database, FastAPI Backend, and Next.js Frontend
+# ─────────────────────────────────────────────────────────────────────────────
+
+databases:
+  - name: skill-letter-db
+    databaseName: skill_letter
+    user: skill_letter_user
+    plan: free
+    region: oregon # or singapore / frankfurt
+
+services:
+  # ── 1. Backend Web Service (FastAPI) ──────────────────────────────────────
+  - type: web
+    name: skill-letter-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skill-letter-db
+          property: connectionString
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: FROM_NAME
+        value: "Skill Letter"
+      - key: FROM_EMAIL
+        value: "onboarding@resend.dev"
+      - key: SCHEDULER_TIMEZONE
+        value: "Asia/Kolkata"
+      - key: FRONTEND_URL
+        value: "https://skill-letter-frontend.onrender.com"
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: YOUTUBE_PLAYLIST_IDS
+        sync: false
+      - key: YOUTUBE_PLAYLIST_NAMES
+        value: "Skill Letter"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
+  # ── 2. Frontend Web Service (Next.js 15) ──────────────────────────────────
+  - type: web
+    name: skill-letter-frontend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20.18.0"
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: skill-letter-api
+          type: web
+          property: host

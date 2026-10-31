@@ -47,10 +47,17 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-# CORS — allow Next.js frontend
+# CORS — allow Next.js frontend (local and Render domains)
+origins = [
+    settings.frontend_url.rstrip("/"),
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "http://localhost:3000"],
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
