@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     # ── App ───────────────────────────────────────────────────────────────
     admin_password: str = "admin"
     frontend_url: str = "http://localhost:3000"
+    backend_url: str = "http://localhost:8000"
 
     # ── Scheduler ─────────────────────────────────────────────────────────
     # Default: every Friday at 11:30 UTC (5 PM IST)

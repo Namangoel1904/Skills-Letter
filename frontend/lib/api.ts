@@ -146,6 +146,31 @@ export interface AdminDashboardData {
     total_words_generated: number;
     open_rate_est: number;
     ctr_est: number;
+    mail_open_rate: number;
+    unique_opens: number;
+    total_opens: number;
+    github_ctr: number;
+    github_ctor: number;
+    github_clicks: number;
+    github_unique_clickers: number;
+    total_link_clicks: number;
+    recent_clicks?: Array<{
+      id: number;
+      url: string;
+      is_github: boolean;
+      tag: string;
+      source: string;
+      timestamp: string;
+      subscriber_id?: number;
+      edition_id?: number;
+    }>;
+    recent_opens?: Array<{
+      id: number;
+      edition_id: number;
+      subscriber_id?: number;
+      timestamp: string;
+      user_agent?: string;
+    }>;
   };
   pipeline: {
     next_edition_number: number;
@@ -220,6 +245,31 @@ export async function broadcastEdition(
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
+}
+
+export async function simulateTrackingEvent(
+  payload: { action: "open" | "click"; edition_id: number; subscriber_id?: number; url?: string }
+): Promise<{ status: string; action: string }> {
+  return apiFetch("/api/track/simulate", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function trackWebClick(payload: {
+  url: string;
+  edition_id?: number;
+  is_github?: boolean;
+  tag?: string;
+}): Promise<{ status: string }> {
+  try {
+    return await apiFetch("/api/track/click-event", {
+      method: "POST",
+      body: JSON.stringify({ ...payload, source: "web" }),
+    });
+  } catch {
+    return { status: "error" };
+  }
 }
 
 // ── Utils ─────────────────────────────────────────────────────────────────

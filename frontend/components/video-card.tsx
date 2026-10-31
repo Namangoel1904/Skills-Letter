@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Github, Cpu, Box, Sparkles, Layers, ArrowRight, ExternalLink } from "lucide-react";
-import { type VideoSummary, CATEGORY_META } from "@/lib/api";
+import { type VideoSummary, CATEGORY_META, trackWebClick } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
 interface VideoCardProps {
@@ -126,6 +126,7 @@ export function VideoCard({ video }: VideoCardProps) {
                 href={video.repo_links[0]}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWebClick({ url: video.repo_links[0], is_github: true, tag: "github" })}
                 className="p-1 rounded-md bg-muted/60 hover:bg-muted text-foreground transition-colors inline-flex items-center gap-1 text-[11px] font-mono"
                 title="GitHub Repo"
               >

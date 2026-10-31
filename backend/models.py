@@ -132,3 +132,47 @@ class ProcessedVideo(SQLModel, table=True):
     edition_id: int = Field(foreign_key="newsletter_editions.id")
     processed_at: datetime = Field(default_factory=datetime.utcnow)
     source_playlist: str = ""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Email Engagement & Click Telemetry Models
+# ─────────────────────────────────────────────────────────────────────────────
+
+class EmailDispatch(SQLModel, table=True):
+    __tablename__ = "email_dispatches"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    edition_id: int = Field(index=True)
+    subscriber_id: int = Field(index=True)
+    resend_email_id: Optional[str] = None
+    sent_at: datetime = Field(default_factory=datetime.utcnow)
+    is_opened: bool = Field(default=False, index=True)
+    opened_at: Optional[datetime] = None
+    open_count: int = Field(default=0)
+    links_clicked_count: int = Field(default=0)
+    github_clicks_count: int = Field(default=0)
+
+
+class EmailOpenEvent(SQLModel, table=True):
+    __tablename__ = "email_open_events"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    edition_id: int = Field(index=True)
+    subscriber_id: Optional[int] = Field(default=None, index=True)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    user_agent: Optional[str] = None
+    ip_address: Optional[str] = None
+
+
+class LinkClickEvent(SQLModel, table=True):
+    __tablename__ = "link_click_events"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    edition_id: Optional[int] = Field(default=None, index=True)
+    subscriber_id: Optional[int] = Field(default=None, index=True)
+    url: str
+    is_github: bool = Field(default=False, index=True)
+    tag: str = "github"
+    source: str = "email"  # "email" or "web"
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    user_agent: Optional[str] = None

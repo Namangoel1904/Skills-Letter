@@ -101,13 +101,16 @@ def render_email_html(
     unsubscribe_url: str,
     subscriber_frequency_label: Optional[str] = None,
     subscriber_email: Optional[str] = None,
+    subscriber_id: Optional[int] = None,
 ) -> str:
     """
     Convert newsletter markdown + structured video cards → full high-fashion Magazine-style HTML email.
     Inspired by L'Officiel / Vogue / MAGZY editorial layouts with cover hero, 2-column spread,
     vibrant editorial accents, and circular action triggers.
+    Includes real 1x1 tracking pixel and redirect links for genuine engagement telemetry.
     """
     from jinja2 import Environment, FileSystemLoader, select_autoescape
+    from urllib.parse import quote_plus
     import os
 
     template_dir = os.path.join(os.path.dirname(__file__), "..", "templates")
@@ -116,6 +119,12 @@ def render_email_html(
         autoescape=select_autoescape(["html"]),
     )
     template = env.get_template("newsletter_email.html")
+
+    tracking_pixel_url = (
+        f"{settings.backend_url}/api/track/open?edition_id={edition.id}&subscriber_id={subscriber_id}"
+        if edition.id and subscriber_id
+        else ""
+    )
 
     category_meta = {
         "github_repo": {
@@ -224,11 +233,17 @@ def render_email_html(
                     seen_urls.add(r)
                     repo_parts = r.rstrip("/").split("/")
                     repo_label = "/".join(repo_parts[-2:]) if len(repo_parts) >= 2 and not repo_parts[-2].endswith(".com") else repo_parts[-1]
+                    tracked_r = (
+                        f"{settings.backend_url}/api/track/click?url={quote_plus(r)}&edition_id={edition.id}&subscriber_id={subscriber_id}&tag=github&source=email"
+                        if edition.id and subscriber_id
+                        else r
+                    )
                     resource_directory.append({
                         "title": raw_title,
                         "clean_title": clean_title,
                         "repo_label": repo_label,
                         "url": r,
+                        "tracked_url": tracked_r,
                         "type": "GitHub",
                         "badge_color": "#047857",
                         "badge_bg": "#ecfdf5",
@@ -243,11 +258,17 @@ def render_email_html(
                     seen_urls.add(m)
                     model_parts = m.rstrip("/").split("/")
                     model_label = "/".join(model_parts[-2:]) if len(model_parts) >= 2 and not model_parts[-2].endswith(".co") else model_parts[-1]
+                    tracked_m = (
+                        f"{settings.backend_url}/api/track/click?url={quote_plus(m)}&edition_id={edition.id}&subscriber_id={subscriber_id}&tag=weights&source=email"
+                        if edition.id and subscriber_id
+                        else m
+                    )
                     resource_directory.append({
                         "title": raw_title,
                         "clean_title": clean_title,
                         "repo_label": model_label,
                         "url": m,
+                        "tracked_url": tracked_m,
                         "type": "Weights",
                         "badge_color": "#6d28d9",
                         "badge_bg": "#f5f3ff",
@@ -255,6 +276,24 @@ def render_email_html(
                         "channel": v.get("channel", "Community"),
                         "video_id": v.get("video_id"),
                     })
+
+    # Wrap Cover story and Numbered Briefs links if tracking enabled
+    if cover_story and edition.id and subscriber_id:
+        if cover_story.get("repo_links") and len(cover_story["repo_links"]) > 0:
+            cover_story["tracked_repo_url"] = (
+                f"{settings.backend_url}/api/track/click?url={quote_plus(cover_story['repo_links'][0])}&edition_id={edition.id}&subscriber_id={subscriber_id}&tag=github&source=email"
+            )
+        if cover_story.get("model_links") and len(cover_story["model_links"]) > 0:
+            cover_story["tracked_model_url"] = (
+                f"{settings.backend_url}/api/track/click?url={quote_plus(cover_story['model_links'][0])}&edition_id={edition.id}&subscriber_id={subscriber_id}&tag=weights&source=email"
+            )
+
+    if edition.id and subscriber_id:
+        for brief in numbered_briefs:
+            if brief.get("repo_links") and len(brief["repo_links"]) > 0:
+                brief["tracked_repo_url"] = (
+                    f"{settings.backend_url}/api/track/click?url={quote_plus(brief['repo_links'][0])}&edition_id={edition.id}&subscriber_id={subscriber_id}&tag=github&source=email"
+                )
 
     # Extract editorial intro from content_markdown (text before the first ##)
     editorial_intro = ""
@@ -293,6 +332,7 @@ def render_email_html(
         subscriber_frequency_label=subscriber_frequency_label,
         subscriber_email=subscriber_email,
         unsubscribe_url=unsubscribe_url,
+        tracking_pixel_url=tracking_pixel_url,
         frontend_url=settings.frontend_url,
         year=datetime.utcnow().year,
     )
@@ -378,6 +418,25 @@ def send_welcome_email(
         return False
 
 
+async def _async_record_dispatch(edition_id: int, subscriber_id: int, resend_id: Optional[str]):
+    """Record an EmailDispatch in the database asynchronously for open & CTR telemetry."""
+    try:
+        from database import AsyncSessionLocal
+        from models import EmailDispatch
+        async with AsyncSessionLocal() as session:
+            disp = EmailDispatch(
+                edition_id=edition_id,
+                subscriber_id=subscriber_id,
+                resend_email_id=resend_id,
+                sent_at=datetime.utcnow(),
+            )
+            session.add(disp)
+            await session.commit()
+            logger.debug(f"Recorded EmailDispatch for edition={edition_id}, sub={subscriber_id}")
+    except Exception as ex:
+        logger.error(f"Failed to record email dispatch: {ex}")
+
+
 def send_newsletter(
     edition: NewsletterEdition,
     subscribers: List[Subscriber],
@@ -417,6 +476,7 @@ def send_newsletter(
                 unsubscribe_url,
                 subscriber_frequency_label=freq_label,
                 subscriber_email=subscriber.email,
+                subscriber_id=subscriber.id,
             )
 
             # Professional subject matching user specification: BeingNotified Skill Letter #X - Weekly Digest of Date
@@ -427,7 +487,7 @@ def send_newsletter(
             )
             subject = f"BeingNotified Skill Letter #{edition.edition_number} - Weekly Digest of {date_str}"
 
-            resend.Emails.send({
+            res = resend.Emails.send({
                 "from": f"{settings.from_name} <{get_sender_email()}>",
                 "to": subscriber.email,
                 "subject": subject,
@@ -435,6 +495,16 @@ def send_newsletter(
             })
             sent_count += 1
             logger.debug(f"Sent to {subscriber.email}")
+
+            # Non-blocking async dispatch record
+            if edition.id and subscriber.id:
+                resend_id = res.get("id") if isinstance(res, dict) else getattr(res, "id", None)
+                try:
+                    import asyncio
+                    loop = asyncio.get_running_loop()
+                    loop.create_task(_async_record_dispatch(edition.id, subscriber.id, resend_id))
+                except RuntimeError:
+                    pass
         except Exception as e:
             logger.error(f"Failed to send to {subscriber.email}: {e}")
 

@@ -237,7 +237,7 @@
 
                       {% if cover_story.repo_links and cover_story.repo_links|length > 0 %}
                       <td style="padding-right: 8px;">
-                        <a href="{{ cover_story.repo_links[0] }}" target="_blank" class="mono-meta" style="display: inline-block; background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 9px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
+                        <a href="{{ cover_story.tracked_repo_url or cover_story.repo_links[0] }}" target="_blank" class="mono-meta" style="display: inline-block; background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 9px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
                           GITHUB REPO ↗
                         </a>
                       </td>
@@ -245,7 +245,7 @@
 
                       {% if cover_story.model_links and cover_story.model_links|length > 0 %}
                       <td>
-                        <a href="{{ cover_story.model_links[0] }}" target="_blank" class="mono-meta" style="display: inline-block; background-color: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; padding: 9px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
+                        <a href="{{ cover_story.tracked_model_url or cover_story.model_links[0] }}" target="_blank" class="mono-meta" style="display: inline-block; background-color: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; padding: 9px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
                           WEIGHTS ↗
                         </a>
                       </td>
@@ -458,7 +458,7 @@
                           </a>
                           {% if brief.repo_links and brief.repo_links|length > 0 %}
                             <span style="color: #cccccc; margin: 0 4px;">|</span>
-                            <a href="{{ brief.repo_links[0] }}" target="_blank" style="font-size: 10px; color: #047857; text-decoration: underline; font-weight: 700;">GitHub ↗</a>
+                            <a href="{{ brief.tracked_repo_url or brief.repo_links[0] }}" target="_blank" style="font-size: 10px; color: #047857; text-decoration: underline; font-weight: 700;">GitHub ↗</a>
                           {% endif %}
                         </div>
                       </td>
@@ -523,7 +523,7 @@
 
                       <!-- Action Badges (Fixed-width, nowrap, never wraps!) -->
                       <td align="right" class="dir-actions-cell" style="padding: 11px 14px; width: 175px; vertical-align: middle; white-space: nowrap;">
-                        <a href="{{ res.url }}" target="_blank" style="display: inline-block; background-color: {{ res.badge_bg }}; color: {{ res.badge_color }}; border: 1px solid {{ res.badge_border }}; padding: 4px 10px; border-radius: 4px; font-size: 10.5px; font-weight: 800; text-decoration: none; font-family: monospace; vertical-align: middle;">
+                        <a href="{{ res.tracked_url or res.url }}" target="_blank" style="display: inline-block; background-color: {{ res.badge_bg }}; color: {{ res.badge_color }}; border: 1px solid {{ res.badge_border }}; padding: 4px 10px; border-radius: 4px; font-size: 10.5px; font-weight: 800; text-decoration: none; font-family: monospace; vertical-align: middle;">
                           {{ res.type }} ↗
                         </a>
                         &nbsp;
@@ -638,6 +638,11 @@
     </td>
   </tr>
 </table>
+
+{% if tracking_pixel_url %}
+<!-- Engagement & Open Tracking Pixel -->
+<img src="{{ tracking_pixel_url }}" width="1" height="1" style="display:none;width:1px;height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;border:none;outline:none;" alt="" />
+{% endif %}
 
 </body>
 </html>

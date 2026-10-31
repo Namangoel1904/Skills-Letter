@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
 from database import init_db
-from routers import newsletter, subscribers, admin
+from routers import newsletter, subscribers, admin, tracking
 from scheduler import start_scheduler, stop_scheduler
 
 # ── Logging ───────────────────────────────────────────────────────────────────
@@ -61,6 +61,7 @@ app.add_middleware(
 app.include_router(newsletter.router)
 app.include_router(subscribers.router)
 app.include_router(admin.router)
+app.include_router(tracking.router)
 
 
 @app.get("/health")

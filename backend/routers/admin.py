@@ -16,12 +16,21 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel
-from sqlmodel import func, select
+from sqlmodel import distinct, func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from config import get_settings
 from database import get_session
-from models import NewsletterEdition, NewsletterStatus, ProcessedVideo, Subscriber, FrequencyOption
+from models import (
+    NewsletterEdition,
+    NewsletterStatus,
+    ProcessedVideo,
+    Subscriber,
+    FrequencyOption,
+    EmailDispatch,
+    EmailOpenEvent,
+    LinkClickEvent,
+)
 from services.email_service import send_newsletter
 from services.newsletter_service import generate_newsletter
 
@@ -242,6 +251,85 @@ async def get_dashboard_telemetry(
     youtube_quota_used = (total_editions * 5) + (total_processed_videos * 2)
     avg_links_per_edition = round(total_curated_links / max(total_editions, 1), 1)
 
+    # ── Real Engagement Telemetry (Email Opens & GitHub Click-Throughs) ──
+    disp_count_res = await db.exec(select(func.count(EmailDispatch.id)))
+    tracked_dispatches = disp_count_res.one() or 0
+    effective_dispatches = max(tracked_dispatches, total_emails_sent)
+
+    unique_opens_res = await db.exec(
+        select(func.count(distinct(EmailDispatch.subscriber_id))).where(EmailDispatch.is_opened == True)
+    )
+    unique_opens = unique_opens_res.one() or 0
+
+    total_opens_res = await db.exec(select(func.count(EmailOpenEvent.id)))
+    total_opens = total_opens_res.one() or 0
+
+    mail_open_rate = (
+        round((unique_opens / effective_dispatches) * 100, 1)
+        if effective_dispatches > 0
+        else 0.0
+    )
+
+    github_clicks_res = await db.exec(
+        select(func.count(LinkClickEvent.id)).where(LinkClickEvent.is_github == True)
+    )
+    github_clicks = github_clicks_res.one() or 0
+
+    github_unique_clickers_res = await db.exec(
+        select(func.count(distinct(LinkClickEvent.subscriber_id))).where(
+            LinkClickEvent.is_github == True,
+            LinkClickEvent.subscriber_id.is_not(None),
+        )
+    )
+    github_unique_clickers = github_unique_clickers_res.one() or 0
+
+    total_clicks_res = await db.exec(select(func.count(LinkClickEvent.id)))
+    total_clicks = total_clicks_res.one() or 0
+
+    # Real GitHub CTR (Click-Through Rate): unique clickers divided by total dispatches
+    github_ctr = (
+        round((github_unique_clickers / effective_dispatches) * 100, 1)
+        if effective_dispatches > 0
+        else (round((github_clicks / max(total_curated_links, 1)) * 100, 1) if github_clicks > 0 else 0.0)
+    )
+    github_ctor = (
+        round((github_unique_clickers / max(unique_opens, 1)) * 100, 1)
+        if unique_opens > 0
+        else 0.0
+    )
+
+    # Recent engagement activity streams
+    recent_clicks_res = await db.exec(
+        select(LinkClickEvent).order_by(LinkClickEvent.timestamp.desc()).limit(8)
+    )
+    recent_clicks = [
+        {
+            "id": c.id,
+            "url": c.url,
+            "is_github": c.is_github,
+            "tag": c.tag,
+            "source": c.source,
+            "timestamp": c.timestamp.isoformat() if c.timestamp else None,
+            "subscriber_id": c.subscriber_id,
+            "edition_id": c.edition_id,
+        }
+        for c in recent_clicks_res.all()
+    ]
+
+    recent_opens_res = await db.exec(
+        select(EmailOpenEvent).order_by(EmailOpenEvent.timestamp.desc()).limit(8)
+    )
+    recent_opens = [
+        {
+            "id": o.id,
+            "edition_id": o.edition_id,
+            "subscriber_id": o.subscriber_id,
+            "timestamp": o.timestamp.isoformat() if o.timestamp else None,
+            "user_agent": o.user_agent,
+        }
+        for o in recent_opens_res.all()
+    ]
+
     # 4. Return aggregated payload
     return {
         "audience": {
@@ -252,8 +340,18 @@ async def get_dashboard_telemetry(
             "total_curated_links": total_curated_links,
             "links_per_edition": avg_links_per_edition,
             "total_words_generated": total_words_generated,
-            "open_rate_est": 68.4 if total_emails_sent > 0 else 0,
-            "ctr_est": 42.1 if total_emails_sent > 0 else 0,
+            "mail_open_rate": mail_open_rate,
+            "unique_opens": unique_opens,
+            "total_opens": total_opens,
+            "github_ctr": github_ctr,
+            "github_ctor": github_ctor,
+            "github_clicks": github_clicks,
+            "github_unique_clickers": github_unique_clickers,
+            "total_link_clicks": total_clicks,
+            "open_rate_est": mail_open_rate,
+            "ctr_est": github_ctr,
+            "recent_clicks": recent_clicks,
+            "recent_opens": recent_opens,
         },
         "pipeline": {
             "next_edition_number": next_edition_number,

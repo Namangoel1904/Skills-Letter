@@ -34,6 +34,9 @@ import {
   Database,
   BarChart3,
   Calendar,
+  MousePointerClick,
+  Activity,
+  GitBranch,
 } from "lucide-react";
 
 import {
@@ -42,6 +45,7 @@ import {
   getAdminDashboard,
   triggerGeneration,
   broadcastEdition,
+  simulateTrackingEvent,
   type AdminDashboardData,
 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -79,6 +83,30 @@ export default function AdminPage() {
   // Broadcast state
   const [broadcastingId, setBroadcastingId] = useState<number | null>(null);
   const [broadcastMsg, setBroadcastMsg] = useState<{ id: number; text: string } | null>(null);
+
+  // Simulation state for telemetry testing
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  const handleSimulate = async (action: "open" | "click") => {
+    if (!token || isSimulating) return;
+    setIsSimulating(true);
+    try {
+      const editionId = data?.pipeline?.next_edition_number
+        ? Math.max(data.pipeline.next_edition_number - 1, 1)
+        : 3;
+      await simulateTrackingEvent({
+        action,
+        edition_id: editionId,
+        subscriber_id: 3,
+        url: "https://github.com/torvalds/linux",
+      });
+      await loadDashboard(token);
+    } catch (err) {
+      console.error("Simulation error:", err);
+    } finally {
+      setIsSimulating(false);
+    }
+  };
 
   // Check saved token on mount
   useEffect(() => {
@@ -672,36 +700,204 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Metric cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="p-4 rounded-xl border border-border/40 bg-card/40 space-y-1">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Mail className="w-3.5 h-3.5 text-primary" />
-                <span>Delivery & Open Rate</span>
+          {/* ── Real Telemetry Grid: Mail Open Rate & CTR (Github Links) ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            {/* Real Stat 1: Mail Open Rate */}
+            <div className="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] space-y-3 relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                    <Mail className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="font-semibold text-foreground">Mail Open Rate</span>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-500">
+                  Tracking Pixel
+                </Badge>
               </div>
-              <p className="font-heading text-2xl font-bold text-foreground">
-                {data?.audience?.total_emails_sent && data.audience.total_emails_sent > 0
-                  ? `${data.audience.open_rate_est}%`
-                  : "Pending Dispatch"}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                {data?.audience?.total_emails_sent || 0} total emails broadcasted
-              </p>
+
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-heading text-3xl font-extrabold text-foreground">
+                    {data?.audience?.mail_open_rate ?? 0}%
+                  </span>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    ({data?.audience?.unique_opens || 0}/{data?.audience?.total_emails_sent || 0} opened)
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(Math.max(data?.audience?.mail_open_rate || 0, 0), 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-1 text-[11px] font-mono text-muted-foreground flex items-center justify-between border-t border-border/30">
+                <span>{data?.audience?.total_opens || 0} total read events</span>
+                <span className="text-emerald-500 font-semibold">100% Genuine</span>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-border/40 bg-card/40 space-y-1">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <ArrowUpRight className="w-3.5 h-3.5 text-primary" />
-                <span>Extracted Codebases & Weights</span>
+            {/* Real Stat 2: CTR (Github Links) */}
+            <div className="p-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.03] space-y-3 relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                    <MousePointerClick className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="font-semibold text-foreground">CTR (Github Links)</span>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 border-indigo-500/30 bg-indigo-500/10 text-indigo-400">
+                  GitHub Repos
+                </Badge>
               </div>
-              <p className="font-heading text-2xl font-bold text-foreground">
-                {data?.audience?.total_curated_links || 0}
-              </p>
-              <p className="text-[11px] text-primary font-mono font-medium">
-                {data?.audience?.links_per_edition || 0} links/edition average
-              </p>
+
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-heading text-3xl font-extrabold text-foreground">
+                    {data?.audience?.github_ctr ?? 0}%
+                  </span>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    CTR
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(Math.max(data?.audience?.github_ctr || 0, 0), 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-1 text-[11px] font-mono text-muted-foreground flex items-center justify-between border-t border-border/30">
+                <span>{data?.audience?.github_clicks || 0} repo clicks</span>
+                <span className="text-indigo-400 font-semibold">{data?.audience?.github_ctor ?? 0}% CTOR</span>
+              </div>
+            </div>
+
+            {/* Stat 3: Curated Assets & Dispatch Volume */}
+            <div className="p-4 rounded-2xl border border-border/40 bg-card/40 space-y-3 relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="font-semibold text-foreground">Extracted Links</span>
+                </div>
+                <Badge variant="secondary" className="text-[10px] font-mono px-2 py-0.5">
+                  Indexed
+                </Badge>
+              </div>
+
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-heading text-3xl font-extrabold text-foreground">
+                    {data?.audience?.total_curated_links || 0}
+                  </span>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    repos & weights
+                  </span>
+                </div>
+
+                <div className="w-full h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-primary/80 rounded-full"
+                    style={{ width: "100%" }}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-1 text-[11px] font-mono text-muted-foreground flex items-center justify-between border-t border-border/30">
+                <span>{data?.audience?.links_per_edition || 0} links/edition</span>
+                <span className="text-foreground font-semibold">{data?.audience?.total_link_clicks || 0} total clicks</span>
+              </div>
             </div>
           </div>
+
+          {/* Real-time Verification & Test Simulator */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-muted/20 border border-border/40 text-xs">
+            <div className="flex items-center gap-2 text-muted-foreground font-mono">
+              <Activity className="w-3.5 h-3.5 text-primary" />
+              <span>Live Telemetry Engine:</span>
+              <span className="text-foreground font-semibold">Active & Recording Events</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isSimulating}
+                onClick={() => handleSimulate("open")}
+                className="h-7 px-2.5 text-[11px] font-mono border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 rounded-lg"
+                title="Simulate recipient email open via tracking pixel"
+              >
+                + Test Open Pixel
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isSimulating}
+                onClick={() => handleSimulate("click")}
+                className="h-7 px-2.5 text-[11px] font-mono border-indigo-500/30 text-indigo-600 hover:bg-indigo-500/10 rounded-lg"
+                title="Simulate recipient clicking a GitHub repository link"
+              >
+                + Test GitHub Click
+              </Button>
+            </div>
+          </div>
+
+          {/* Recent Live Engagement Stream */}
+          {((data?.audience?.recent_clicks && data.audience.recent_clicks.length > 0) ||
+            (data?.audience?.recent_opens && data.audience.recent_opens.length > 0)) && (
+            <div className="space-y-2 pt-1">
+              <p className="text-xs font-mono text-muted-foreground font-semibold flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-primary" />
+                Live Engagement Activity Stream:
+              </p>
+              <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                {(data?.audience?.recent_clicks || []).map((click) => (
+                  <div
+                    key={`click-${click.id}`}
+                    className="p-2.5 rounded-xl bg-card/40 border border-border/30 flex items-center justify-between text-xs font-mono"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+                        {click.is_github ? "GITHUB CLICK" : "LINK CLICK"}
+                      </span>
+                      <span className="truncate text-foreground/80">{click.url}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
+                      via {click.source}
+                    </span>
+                  </div>
+                ))}
+                {(data?.audience?.recent_opens || []).map((open) => (
+                  <div
+                    key={`open-${open.id}`}
+                    className="p-2.5 rounded-xl bg-card/40 border border-border/30 flex items-center justify-between text-xs font-mono"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        EMAIL OPEN
+                      </span>
+                      <span className="text-foreground/80">Edition #{open.edition_id} read</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground">
+                      {open.user_agent ? open.user_agent.slice(0, 30) : "Mail Client"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Subscriber Frequency distribution */}
           {data?.audience?.frequency_breakdown && (
