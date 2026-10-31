@@ -5,7 +5,9 @@ Handles subscription with frequency configuration, confirmation emails, and unsu
 from __future__ import annotations
 
 import logging
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -61,20 +63,55 @@ async def subscribe(payload: SubscriberCreate, db: AsyncSession = Depends(get_se
     return subscriber
 
 
+class UnsubscribeRequest(BaseModel):
+    email: Optional[str] = None
+    token: Optional[str] = None
+
+
 @router.post("/unsubscribe")
-async def unsubscribe(token: str = Query(...), db: AsyncSession = Depends(get_session)):
-    """One-click unsubscribe using token."""
-    result = await db.exec(
-        select(Subscriber).where(Subscriber.unsubscribe_token == token)
-    )
+async def unsubscribe(
+    payload: Optional[UnsubscribeRequest] = None,
+    token: Optional[str] = Query(None),
+    email: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_session),
+):
+    """
+    Unsubscribe using token (from email link) or email address directly.
+    Accepts:
+    - POST /api/subscribers/unsubscribe?email=user@example.com
+    - POST /api/subscribers/unsubscribe?token=<token>
+    - POST /api/subscribers/unsubscribe with JSON body {"email": "user@example.com"}
+    """
+    resolved_email = (payload.email if payload and payload.email else None) or email
+    resolved_token = (payload.token if payload and payload.token else None) or token
+
+    if not resolved_email and not resolved_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either 'email' or 'token' must be provided",
+        )
+
+    query = select(Subscriber)
+    if resolved_token:
+        query = query.where(Subscriber.unsubscribe_token == resolved_token.strip())
+    elif resolved_email:
+        query = query.where(Subscriber.email == resolved_email.strip())
+
+    result = await db.exec(query)
     subscriber = result.first()
     if not subscriber:
-        raise HTTPException(status_code=404, detail="Invalid unsubscribe token")
+        raise HTTPException(status_code=404, detail="Subscriber not found")
 
     subscriber.is_active = False
     db.add(subscriber)
     await db.commit()
-    return {"message": "Successfully unsubscribed"}
+    logger.info(f"Unsubscribed: {subscriber.email}")
+    return {
+        "success": True,
+        "message": f"Successfully unsubscribed {subscriber.email}",
+        "email": subscriber.email,
+        "is_active": False,
+    }
 
 
 @router.get("/count")
