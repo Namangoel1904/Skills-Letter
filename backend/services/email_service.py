@@ -100,11 +100,12 @@ def render_email_html(
     edition: NewsletterEdition,
     unsubscribe_url: str,
     subscriber_frequency_label: Optional[str] = None,
+    subscriber_email: Optional[str] = None,
 ) -> str:
     """
     Convert newsletter markdown + structured video cards → full high-fashion Magazine-style HTML email.
     Inspired by L'Officiel / Vogue / MAGZY editorial layouts with cover hero, 2-column spread,
-    and circular action triggers.
+    vibrant editorial accents, and circular action triggers.
     """
     from jinja2 import Environment, FileSystemLoader, select_autoescape
     import os
@@ -121,30 +122,45 @@ def render_email_html(
             "label": "Open Source Gems & Frameworks",
             "short": "Open Source",
             "icon": "🛠",
+            "color": "#047857",
+            "bg": "#ecfdf5",
+            "border": "#a7f3d0",
             "description": "Breakthrough repositories & vibe-coding tooling",
         },
         "llm_model": {
             "label": "Local AI Models & Weights",
             "short": "Local AI",
             "icon": "🤖",
+            "color": "#6d28d9",
+            "bg": "#f5f3ff",
+            "border": "#ddd6fe",
             "description": "Quantized weights & local inference checkpoints",
         },
         "skill_tool": {
             "label": "Agentic Skills & Prompts",
             "short": "Agentic Tools",
             "icon": "✨",
+            "color": "#b45309",
+            "bg": "#fffbeb",
+            "border": "#fde68a",
             "description": "Cursor rules, Claude instructions & AGY prompts",
         },
         "ui_ux": {
             "label": "UI / UX & Component Kits",
             "short": "Design & UI",
             "icon": "🎨",
+            "color": "#be123c",
+            "bg": "#fff1f2",
+            "border": "#fecdd3",
             "description": "Design systems, Shadcn expansions & micro-interactions",
         },
         "other": {
             "label": "Architectures & Deep Dives",
             "short": "Engineering",
             "icon": "📦",
+            "color": "#0e7490",
+            "bg": "#ecfeff",
+            "border": "#a5f3fc",
             "description": "System design & engineering technical discussions",
         },
     }
@@ -163,6 +179,10 @@ def render_email_html(
         cmeta = category_meta.get(c.get("category"), category_meta["other"])
         c["category_label"] = cmeta["label"]
         c["category_short"] = cmeta["short"]
+        c["category_color"] = cmeta["color"]
+        c["category_bg"] = cmeta["bg"]
+        c["category_border"] = cmeta["border"]
+        c["category_icon"] = cmeta["icon"]
         cover_story = c
 
         # 2. Stories for 2-column editorial grid & numbered briefs
@@ -176,32 +196,65 @@ def render_email_html(
             for itm in pair:
                 imeta = category_meta.get(itm.get("category"), category_meta["other"])
                 itm["category_short"] = imeta["short"]
+                itm["category_color"] = imeta["color"]
+                itm["category_bg"] = imeta["bg"]
+                itm["category_border"] = imeta["border"]
+                itm["category_icon"] = imeta["icon"]
             editorial_pairs.append(pair)
 
         for idx, itm in enumerate(brief_items):
             imeta = category_meta.get(itm.get("category"), category_meta["other"])
             itm["category_short"] = imeta["short"]
+            itm["category_color"] = imeta["color"]
+            itm["category_bg"] = imeta["bg"]
+            itm["category_border"] = imeta["border"]
+            itm["category_icon"] = imeta["icon"]
             itm["num_str"] = f"{idx + 1:02d}"
             numbered_briefs.append(itm)
 
-        # 3. Complete Resource Directory for bottom of magazine
+        # 3. Clean & Deduplicated Resource Directory (No line-breaking bugs!)
+        seen_urls = set()
         for v in raw_videos:
+            raw_title = (v.get("title") or "Technical Resource").strip()
+            clean_title = raw_title[:46] + ("…" if len(raw_title) > 46 else "")
+
             for r in (v.get("repo_links") or []):
-                resource_directory.append({
-                    "title": v.get("title", "Project Repository"),
-                    "url": r,
-                    "type": "GitHub Repo",
-                    "channel": v.get("channel", "Community"),
-                    "video_id": v.get("video_id"),
-                })
+                r = r.strip()
+                if r and r not in seen_urls:
+                    seen_urls.add(r)
+                    repo_parts = r.rstrip("/").split("/")
+                    repo_label = "/".join(repo_parts[-2:]) if len(repo_parts) >= 2 and not repo_parts[-2].endswith(".com") else repo_parts[-1]
+                    resource_directory.append({
+                        "title": raw_title,
+                        "clean_title": clean_title,
+                        "repo_label": repo_label,
+                        "url": r,
+                        "type": "GitHub",
+                        "badge_color": "#047857",
+                        "badge_bg": "#ecfdf5",
+                        "badge_border": "#a7f3d0",
+                        "channel": v.get("channel", "Community"),
+                        "video_id": v.get("video_id"),
+                    })
+
             for m in (v.get("model_links") or []):
-                resource_directory.append({
-                    "title": v.get("title", "AI Weights Checkpoint"),
-                    "url": m,
-                    "type": "Model Weights",
-                    "channel": v.get("channel", "Community"),
-                    "video_id": v.get("video_id"),
-                })
+                m = m.strip()
+                if m and m not in seen_urls:
+                    seen_urls.add(m)
+                    model_parts = m.rstrip("/").split("/")
+                    model_label = "/".join(model_parts[-2:]) if len(model_parts) >= 2 and not model_parts[-2].endswith(".co") else model_parts[-1]
+                    resource_directory.append({
+                        "title": raw_title,
+                        "clean_title": clean_title,
+                        "repo_label": model_label,
+                        "url": m,
+                        "type": "Weights",
+                        "badge_color": "#6d28d9",
+                        "badge_bg": "#f5f3ff",
+                        "badge_border": "#ddd6fe",
+                        "channel": v.get("channel", "Community"),
+                        "video_id": v.get("video_id"),
+                    })
 
     # Extract editorial intro from content_markdown (text before the first ##)
     editorial_intro = ""
@@ -238,6 +291,7 @@ def render_email_html(
         content_html=content_html,
         issue_date_str=issue_date_str,
         subscriber_frequency_label=subscriber_frequency_label,
+        subscriber_email=subscriber_email,
         unsubscribe_url=unsubscribe_url,
         frontend_url=settings.frontend_url,
         year=datetime.utcnow().year,
@@ -356,7 +410,12 @@ def send_newsletter(
         )
         try:
             freq_label = FREQUENCY_SCHEDULE_MAP.get(subscriber.frequency, {}).get("label", "Weekly Flagship")
-            html_body = render_email_html(edition, unsubscribe_url, subscriber_frequency_label=freq_label)
+            html_body = render_email_html(
+                edition,
+                unsubscribe_url,
+                subscriber_frequency_label=freq_label,
+                subscriber_email=subscriber.email,
+            )
 
             resend.Emails.send({
                 "from": f"{settings.from_name} <{get_sender_email()}>",
