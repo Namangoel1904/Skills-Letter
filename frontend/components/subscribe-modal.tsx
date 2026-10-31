@@ -68,7 +68,7 @@ export function SubscribeModal({ children }: SubscribeModalProps) {
         if (!v) reset();
       }}
     >
-      <DialogTrigger render={children as React.ReactElement} />
+      <DialogTrigger nativeButton={false} render={children as React.ReactElement} />
       <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl border-border/60 bg-card/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.3)]">
         {/* Glow backdrop */}
         <div className="absolute -top-24 -left-24 w-56 h-56 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
