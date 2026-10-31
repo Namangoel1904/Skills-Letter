@@ -96,9 +96,15 @@ def should_send_today(frequency: FrequencyOption) -> bool:
 #  Email Rendering (Jinja2)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def render_email_html(edition: NewsletterEdition, unsubscribe_url: str) -> str:
+def render_email_html(
+    edition: NewsletterEdition,
+    unsubscribe_url: str,
+    subscriber_frequency_label: Optional[str] = None,
+) -> str:
     """
-    Convert newsletter markdown + structured video cards → full HTML email using Jinja2 template.
+    Convert newsletter markdown + structured video cards → full high-fashion Magazine-style HTML email.
+    Inspired by L'Officiel / Vogue / MAGZY editorial layouts with cover hero, 2-column spread,
+    and circular action triggers.
     """
     from jinja2 import Environment, FileSystemLoader, select_autoescape
     import os
@@ -110,55 +116,92 @@ def render_email_html(edition: NewsletterEdition, unsubscribe_url: str) -> str:
     )
     template = env.get_template("newsletter_email.html")
 
-    # Group videos by category for structured card presentation
-    category_order = ["github_repo", "llm_model", "skill_tool", "ui_ux", "other"]
     category_meta = {
         "github_repo": {
             "label": "Open Source Gems & Frameworks",
+            "short": "Open Source",
             "icon": "🛠",
             "description": "Breakthrough repositories & vibe-coding tooling",
         },
         "llm_model": {
             "label": "Local AI Models & Weights",
+            "short": "Local AI",
             "icon": "🤖",
             "description": "Quantized weights & local inference checkpoints",
         },
         "skill_tool": {
             "label": "Agentic Skills & Prompts",
+            "short": "Agentic Tools",
             "icon": "✨",
             "description": "Cursor rules, Claude instructions & AGY prompts",
         },
         "ui_ux": {
             "label": "UI / UX & Component Kits",
+            "short": "Design & UI",
             "icon": "🎨",
             "description": "Design systems, Shadcn expansions & micro-interactions",
         },
         "other": {
             "label": "Architectures & Deep Dives",
+            "short": "Engineering",
             "icon": "📦",
             "description": "System design & engineering technical discussions",
         },
     }
 
-    categorized_videos = []
-    videos = edition.videos or []
-    for cat_key in category_order:
-        cat_videos = [v for v in videos if v.get("category") == cat_key]
-        if cat_videos:
-            categorized_videos.append({
-                "key": cat_key,
-                "meta": category_meta.get(cat_key, category_meta["other"]),
-                "videos": cat_videos,
-            })
+    raw_videos = edition.videos or []
+    cover_story = None
+    editorial_pairs = []
+    numbered_briefs = []
+    resource_directory = []
 
-    known_cats = set(category_order)
-    other_extras = [v for v in videos if v.get("category") not in known_cats]
-    if other_extras:
-        categorized_videos.append({
-            "key": "other",
-            "meta": category_meta["other"],
-            "videos": other_extras,
-        })
+    if raw_videos:
+        # 1. Lead Cover Story
+        c = dict(raw_videos[0])
+        dur = c.get("duration_seconds", 0)
+        c["duration_text"] = f"{max(dur // 60, 3)} min read" if dur else "Deep Dive"
+        cmeta = category_meta.get(c.get("category"), category_meta["other"])
+        c["category_label"] = cmeta["label"]
+        c["category_short"] = cmeta["short"]
+        cover_story = c
+
+        # 2. Stories for 2-column editorial grid & numbered briefs
+        rest = [dict(v) for v in raw_videos[1:]]
+        max_grid = 4 if len(rest) > 6 else 6
+        grid_items = rest[:max_grid]
+        brief_items = rest[max_grid:]
+
+        for i in range(0, len(grid_items), 2):
+            pair = grid_items[i : i + 2]
+            for itm in pair:
+                imeta = category_meta.get(itm.get("category"), category_meta["other"])
+                itm["category_short"] = imeta["short"]
+            editorial_pairs.append(pair)
+
+        for idx, itm in enumerate(brief_items):
+            imeta = category_meta.get(itm.get("category"), category_meta["other"])
+            itm["category_short"] = imeta["short"]
+            itm["num_str"] = f"{idx + 1:02d}"
+            numbered_briefs.append(itm)
+
+        # 3. Complete Resource Directory for bottom of magazine
+        for v in raw_videos:
+            for r in (v.get("repo_links") or []):
+                resource_directory.append({
+                    "title": v.get("title", "Project Repository"),
+                    "url": r,
+                    "type": "GitHub Repo",
+                    "channel": v.get("channel", "Community"),
+                    "video_id": v.get("video_id"),
+                })
+            for m in (v.get("model_links") or []):
+                resource_directory.append({
+                    "title": v.get("title", "AI Weights Checkpoint"),
+                    "url": m,
+                    "type": "Model Weights",
+                    "channel": v.get("channel", "Community"),
+                    "video_id": v.get("video_id"),
+                })
 
     # Extract editorial intro from content_markdown (text before the first ##)
     editorial_intro = ""
@@ -179,11 +222,22 @@ def render_email_html(edition: NewsletterEdition, unsubscribe_url: str) -> str:
         extensions=["extra", "codehilite", "nl2br"],
     )
 
+    issue_date_str = (
+        edition.generated_at.strftime("%B %d, %Y")
+        if edition.generated_at
+        else datetime.utcnow().strftime("%B %d, %Y")
+    )
+
     return template.render(
         edition=edition,
-        categorized_videos=categorized_videos,
+        cover_story=cover_story,
+        editorial_pairs=editorial_pairs,
+        numbered_briefs=numbered_briefs,
+        resource_directory=resource_directory,
         editorial_intro=editorial_intro,
         content_html=content_html,
+        issue_date_str=issue_date_str,
+        subscriber_frequency_label=subscriber_frequency_label,
         unsubscribe_url=unsubscribe_url,
         frontend_url=settings.frontend_url,
         year=datetime.utcnow().year,
@@ -301,7 +355,8 @@ def send_newsletter(
             f"{settings.frontend_url}/unsubscribe?token={subscriber.unsubscribe_token}"
         )
         try:
-            html_body = render_email_html(edition, unsubscribe_url)
+            freq_label = FREQUENCY_SCHEDULE_MAP.get(subscriber.frequency, {}).get("label", "Weekly Flagship")
+            html_body = render_email_html(edition, unsubscribe_url, subscriber_frequency_label=freq_label)
 
             resend.Emails.send({
                 "from": f"{settings.from_name} <{get_sender_email()}>",

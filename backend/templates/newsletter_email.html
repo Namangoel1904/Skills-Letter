@@ -4,45 +4,116 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="x-apple-disable-message-reformatting" />
-  <title>{{ edition.title }}</title>
+  <title>TechPulse Magazine · Issue #{{ edition.edition_number }}</title>
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
   <style>
+    /* Reset & Base Styles */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { margin: 0; padding: 0; background: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif; -webkit-text-size-adjust: 100%; color: #cbd5e1; }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f4ef;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      color: #1a1a1a;
+    }
     table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
     img { border: 0; outline: none; text-decoration: none; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
-    h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; color: #f8fafc; }
-    h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.3; color: #f1f5f9; }
-    p { font-size: 14px; line-height: 1.7; color: #94a3b8; margin: 0 0 14px; }
+
+    /* Editorial Typography */
+    .serif-masthead {
+      font-family: 'Playfair Display', Didot, 'Bodoni MT', 'Times New Roman', Georgia, serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #000000;
+    }
+    .serif-title {
+      font-family: 'Playfair Display', Didot, Georgia, 'Times New Roman', serif;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #000000;
+      text-transform: uppercase;
+    }
+    .serif-quote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+    }
+    .mono-meta {
+      font-family: 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+      text-transform: uppercase;
+    }
+
+    /* Responsive Grid */
+    @media screen and (max-width: 620px) {
+      .mag-container { width: 100% !important; padding: 18px 14px !important; }
+      .masthead-title { font-size: 38px !important; }
+      .grid-col { display: block !important; width: 100% !important; padding-bottom: 20px !important; }
+      .grid-spacer { display: none !important; width: 0 !important; }
+      .hero-img { height: 200px !important; }
+      .thumb-img { width: 90px !important; height: 70px !important; }
+    }
+
+    /* Dark Mode Overrides for Mail Clients */
+    @media (prefers-color-scheme: dark) {
+      body, .canvas-bg { background-color: #0a0a0e !important; }
+      .mag-container { background-color: #121218 !important; border-color: #242432 !important; box-shadow: none !important; }
+      .serif-masthead { color: #ffffff !important; }
+      .serif-title { color: #f8fafc !important; }
+      .mag-rule-black { border-color: #ffffff !important; }
+      .mag-rule-subtle { border-color: #2a2a3c !important; }
+      .mag-rule-double { border-top-color: #ffffff !important; border-bottom-color: #ffffff !important; }
+      .body-muted { color: #94a3b8 !important; }
+      .pullquote-box { background-color: #171722 !important; border-left-color: #818cf8 !important; }
+      .pullquote-text { color: #cbd5e1 !important; }
+      .action-pill-black { background-color: #ffffff !important; color: #000000 !important; }
+      .action-pill-secondary { background-color: #1e1e2c !important; color: #e2e8f0 !important; border-color: #333348 !important; }
+      .arrow-btn { background-color: #ffffff !important; color: #000000 !important; }
+      .directory-box { background-color: #161622 !important; border-color: #252538 !important; }
+      .dir-row { border-bottom-color: #242436 !important; }
+      .dir-title { color: #e2e8f0 !important; }
+      .web-callout-box { background-color: #161624 !important; border-color: #2c2c44 !important; }
+    }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background: #0a0a0f;">
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<body style="margin: 0; padding: 0; background-color: #f5f4ef;">
+<!-- Invisible Preview Text for Mail Inboxes -->
+<div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f5f4ef;">
+  TechPulse Vol. 1 · Issue #{{ edition.edition_number }} — {{ edition.title }}. {{ edition.video_count }} curated open-source repositories, local AI models, and vibe-coding releases.
+  &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="canvas-bg" style="background-color: #f5f4ef;">
   <tr>
-    <td align="center" style="padding: 36px 12px; background: #0a0a0f;">
+    <td align="center" style="padding: 28px 10px 48px;">
 
-      <!-- Main Container (620px max width for mobile & desktop) -->
-      <table width="620" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 620px; width: 100%;">
+      <!-- ══════════════════════════════════════════════════════════════════ -->
+      <!--  MAIN MAGAZINE SPREAD (Max-width 640px)                           -->
+      <!-- ══════════════════════════════════════════════════════════════════ -->
+      <table width="640" cellpadding="0" cellspacing="0" role="presentation" class="mag-container" style="max-width: 640px; width: 100%; background-color: #ffffff; border: 1px solid #e7e5df; box-shadow: 0 10px 35px rgba(0,0,0,0.06); padding: 32px 28px;">
 
-        <!-- ── 1. Brand Header ── -->
+        <!-- ── Top Metadata Bar (Double Rule) ── -->
         <tr>
-          <td style="padding-bottom: 24px;">
-            <table width="100%" cellpadding="0" cellspacing="0">
+          <td>
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="mag-rule-double" style="border-top: 3px solid #111111; border-bottom: 1px solid #111111; padding: 7px 0; margin-bottom: 24px;">
               <tr>
-                <td>
-                  <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">
-                    Tech<span style="color: #6366f1;">Pulse</span>
+                <td align="left">
+                  <span class="mono-meta body-muted" style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #111111;">
+                    VOL. 1 · ISSUE #{{ edition.edition_number }}
                   </span>
-                  <span style="font-size: 10px; font-weight: 700; color: #6366f1; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); border-radius: 999px; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; margin-left: 8px; vertical-align: middle;">
-                    Technical Digest
+                </td>
+                <td align="center">
+                  <span class="mono-meta body-muted" style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #666666;">
+                    TECHPULSE JOURNAL
                   </span>
                 </td>
                 <td align="right">
-                  <span style="font-size: 12px; font-family: monospace; font-weight: 700; color: #818cf8; background: #161626; border: 1px solid #282844; padding: 4px 10px; border-radius: 8px;">
-                    Edition #{{ edition.edition_number }}
+                  <span class="mono-meta body-muted" style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #111111;">
+                    {{ issue_date_str }}
                   </span>
                 </td>
               </tr>
@@ -50,256 +121,433 @@
           </td>
         </tr>
 
-        <!-- ── 2. Hero Editorial Banner ── -->
+        <!-- ── Magazine Masthead (L'Officiel / MAGZY Style) ── -->
         <tr>
-          <td style="background: linear-gradient(135deg, #0f0f1c 0%, #141428 50%, #0f0f1c 100%); border: 1px solid #222238; border-radius: 20px; padding: 36px 32px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
-            
-            <div style="margin-bottom: 16px;">
-              <span style="font-size: 11px; font-weight: 700; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; font-family: monospace;">
-                ⚡ {{ edition.generated_at.strftime('%B %d, %Y') if edition.generated_at else 'Weekly Technical Intel' }}
-              </span>
-              <span style="color: #475569; margin: 0 6px;">·</span>
-              <span style="font-size: 11px; font-family: monospace; color: #94a3b8;">
-                {{ edition.video_count }} Curated Drops
-              </span>
-            </div>
+          <td align="center" style="padding: 8px 0 18px;">
+            <a href="{{ frontend_url }}/edition/{{ edition.id }}" target="_blank" style="text-decoration: none; display: block;">
+              <h1 class="serif-masthead masthead-title" style="font-family: 'Playfair Display', Didot, 'Bodoni MT', 'Times New Roman', Georgia, serif; font-size: 52px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; line-height: 0.95; color: #0a0a0a; margin: 0;">
+                TECHPULSE
+              </h1>
+            </a>
+            <p class="mono-meta body-muted" style="font-size: 10.5px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #555555; margin: 10px 0 0;">
+              THE CHRONICLE OF OPEN SOURCE, LOCAL AI & VIBE CODING
+            </p>
+            <div class="mag-rule-black" style="border-bottom: 2px solid #111111; width: 100%; margin: 18px auto 0;"></div>
+          </td>
+        </tr>
 
-            <h1 style="margin-bottom: 16px; font-size: 26px; font-weight: 800; line-height: 1.25; color: #f8fafc;">
-              {{ edition.title }}
-            </h1>
-
-            {% if editorial_intro %}
-            <p style="font-size: 15px; color: #cbd5e1; line-height: 1.7; margin-bottom: 20px;">
+        <!-- ── Editorial Welcome Note ── -->
+        {% if editorial_intro %}
+        <tr>
+          <td style="padding: 12px 6px 20px;">
+            <p style="font-size: 14px; line-height: 1.65; color: #444444; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; text-align: justify;">
               {{ editorial_intro }}
             </p>
-            {% else %}
-            <p style="font-size: 15px; color: #cbd5e1; line-height: 1.7; margin-bottom: 20px;">
-              Here is your high-signal technical digest synthesized from this week's code releases, local AI models, and vibe-coding tools. Direct repository links and key takeaways — zero algorithmic fluff.
-            </p>
-            {% endif %}
-
-            <table cellpadding="0" cellspacing="0" role="presentation">
-              <tr>
-                <td style="border-radius: 10px; background: #6366f1;">
-                  <a href="{{ frontend_url }}/edition/{{ edition.id }}" target="_blank" style="display: inline-block; padding: 10px 20px; font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 10px;">
-                    Read Full Edition on Web →
-                  </a>
-                </td>
-              </tr>
-            </table>
-
           </td>
         </tr>
-
-        <!-- Spacer -->
-        <tr><td style="height: 32px;"></td></tr>
-
-        <!-- ── 3. Categorized Drops Feed ── -->
-        {% if categorized_videos and categorized_videos|length > 0 %}
-          {% for cat in categorized_videos %}
-            <!-- Category Header -->
-            <tr>
-              <td style="padding: 18px 0 12px;">
-                <table width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td>
-                      <span style="font-size: 18px; margin-right: 6px;">{{ cat.meta.icon }}</span>
-                      <span style="font-size: 15px; font-weight: 800; color: #f1f5f9; letter-spacing: -0.2px; text-transform: uppercase;">
-                        {{ cat.meta.label }}
-                      </span>
-                    </td>
-                    <td align="right">
-                      <span style="font-size: 10px; font-family: monospace; color: #818cf8; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); padding: 2px 8px; border-radius: 6px;">
-                        {{ cat.videos|length }} {{ 'pick' if cat.videos|length == 1 else 'picks' }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" style="padding-top: 4px;">
-                      <span style="font-size: 11px; color: #64748b; font-family: monospace;">{{ cat.meta.description }}</span>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Category Cards -->
-            {% for item in cat.videos %}
-            <tr>
-              <td style="padding-bottom: 16px;">
-                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background: #11111a; border: 1px solid #1f1f30; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
-                  
-                  <!-- Tag & Channel -->
-                  <tr>
-                    <td style="padding-bottom: 8px;">
-                      {% if item.tags and item.tags|length > 0 %}
-                        {% for tag in item.tags[:2] %}
-                          <span style="display: inline-block; font-size: 10px; font-family: monospace; color: #818cf8; background: #181828; border: 1px solid #2a2a40; padding: 2px 7px; border-radius: 6px; margin-right: 4px;">
-                            #{{ tag.lower().replace(' ', '') }}
-                          </span>
-                        {% endfor %}
-                      {% endif %}
-                      {% if item.channel %}
-                        <span style="font-size: 11px; color: #475569; font-family: monospace;">via {{ item.channel }}</span>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <!-- Item Title (Links to dedicated drop page on our web platform!) -->
-                  <tr>
-                    <td style="padding-bottom: 10px;">
-                      <a href="{{ frontend_url }}/drop/{{ item.video_id }}" target="_blank" style="font-size: 17px; font-weight: 700; line-height: 1.35; color: #f8fafc; text-decoration: none; display: block;">
-                        {{ item.title }}
-                      </a>
-                    </td>
-                  </tr>
-
-                  <!-- Executive TLDR -->
-                  <tr>
-                    <td style="padding-bottom: 14px;">
-                      <p style="font-size: 13.5px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                        {{ item.tldr }}
-                      </p>
-                    </td>
-                  </tr>
-
-                  <!-- Key Technical Insights / Bullets -->
-                  {% if item.key_points and item.key_points|length > 0 %}
-                  <tr>
-                    <td style="padding-bottom: 14px;">
-                      <table width="100%" cellpadding="0" cellspacing="0" style="background: #151522; border: 1px solid #202033; border-radius: 10px; padding: 12px 14px;">
-                        <tr>
-                          <td style="padding: 10px 12px;">
-                            <span style="font-size: 10px; font-family: monospace; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;">
-                              Key Capabilities & Takeaways:
-                            </span>
-                            {% for point in item.key_points[:3] %}
-                              <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 5px;">
-                                <span style="color: #6366f1; font-weight: bold; margin-right: 6px;">›</span>{{ point }}
-                              </div>
-                            {% endfor %}
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  {% endif %}
-
-                  <!-- Why It Matters Callout -->
-                  {% if item.why_it_matters %}
-                  <tr>
-                    <td style="padding-bottom: 16px;">
-                      <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(99,102,241,0.06); border-left: 3px solid #6366f1; padding: 10px 14px; border-radius: 0 8px 8px 0;">
-                        <tr>
-                          <td style="padding: 6px 10px;">
-                            <span style="font-size: 10px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px; font-family: monospace;">Why it matters:</span>
-                            <span style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; display: block; margin-top: 2px;">
-                              {{ item.why_it_matters }}
-                            </span>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  {% endif %}
-
-                  <!-- Action Buttons Bar -->
-                  <tr>
-                    <td style="padding-top: 6px; border-top: 1px solid #1a1a28;">
-                      <table cellpadding="0" cellspacing="0" role="presentation">
-                        <tr>
-                          <!-- Primary breakdown link -->
-                          <td style="padding-right: 8px;">
-                            <a href="{{ frontend_url }}/drop/{{ item.video_id }}" target="_blank" style="display: inline-block; font-size: 11.5px; font-weight: 700; color: #ffffff; background: #6366f1; padding: 7px 14px; border-radius: 8px; text-decoration: none;">
-                              Full Breakdown →
-                            </a>
-                          </td>
-
-                          <!-- GitHub repo direct button -->
-                          {% if item.repo_links and item.repo_links|length > 0 %}
-                          <td style="padding-right: 8px;">
-                            <a href="{{ item.repo_links[0] }}" target="_blank" style="display: inline-block; font-size: 11.5px; font-weight: 600; color: #cbd5e1; background: #1a1a2a; border: 1px solid #2e2e44; padding: 7px 12px; border-radius: 8px; text-decoration: none; font-family: monospace;">
-                              GitHub ↗
-                            </a>
-                          </td>
-                          {% endif %}
-
-                          <!-- Model weights direct button -->
-                          {% if item.model_links and item.model_links|length > 0 %}
-                          <td>
-                            <a href="{{ item.model_links[0] }}" target="_blank" style="display: inline-block; font-size: 11.5px; font-weight: 600; color: #c084fc; background: #20172e; border: 1px solid #3c245c; padding: 7px 12px; border-radius: 8px; text-decoration: none; font-family: monospace;">
-                              Weights ↗
-                            </a>
-                          </td>
-                          {% endif %}
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                </table>
-              </td>
-            </tr>
-            {% endfor %}
-
-          {% endfor %}
-        {% else %}
-          <!-- Fallback raw markdown content if structured videos array is not present -->
-          <tr>
-            <td style="padding: 24px; background: #11111a; border: 1px solid #1f1f30; border-radius: 16px;">
-              {{ content_html | safe }}
-            </td>
-          </tr>
         {% endif %}
 
-        <!-- Spacer -->
-        <tr><td style="height: 36px;"></td></tr>
-
-        <!-- ── 4. Web App Callout ── -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 1: THE COVER STORY / LEAD FEATURE                        -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        {% if cover_story %}
         <tr>
-          <td style="background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%); border: 1px solid rgba(99,102,241,0.2); border-radius: 16px; padding: 28px 24px; text-align: center;">
-            <p style="font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;">
-              Want to search historical archives and explore code repositories?
-            </p>
-            <p style="font-size: 12.5px; color: #94a3b8; margin-bottom: 16px;">
-              Every drop is indexed with full transcript takeaways and embedded source videos on the web platform.
-            </p>
-            <table align="center" cellpadding="0" cellspacing="0" role="presentation">
+          <td style="padding-top: 10px; padding-bottom: 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+              
+              <!-- Cover Story Category Flag -->
               <tr>
-                <td style="border-radius: 10px; background: #6366f1;">
-                  <a href="{{ frontend_url }}/edition/{{ edition.id }}" target="_blank" style="display: inline-block; padding: 11px 24px; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 10px;">
-                    Open Edition #{{ edition.edition_number }} on Web →
+                <td style="padding-bottom: 8px;">
+                  <span class="mono-meta" style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #111111; background-color: #ebeae5; padding: 4px 8px; border-radius: 2px;">
+                    ★ COVER STORY · {{ cover_story.category_label|upper }}
+                  </span>
+                  <span class="mono-meta body-muted" style="font-size: 11px; color: #777777; margin-left: 10px;">
+                    REPORTED VIA {{ cover_story.channel|upper }}
+                  </span>
+                </td>
+              </tr>
+
+              <!-- Large Lead Visual -->
+              <tr>
+                <td style="padding-bottom: 14px;">
+                  <a href="{{ frontend_url }}/drop/{{ cover_story.video_id }}" target="_blank" style="display: block;">
+                    <img src="{{ cover_story.thumbnail_url }}" alt="{{ cover_story.title }}" class="hero-img" width="100%" style="width: 100%; max-height: 290px; height: auto; object-fit: cover; border-radius: 4px; display: block; border: 1px solid #e0ded8;" />
                   </a>
+                </td>
+              </tr>
+
+              <!-- Cover Story Headline (Links to Drop Page on our web platform!) -->
+              <tr>
+                <td style="padding-bottom: 10px;">
+                  <a href="{{ frontend_url }}/drop/{{ cover_story.video_id }}" target="_blank" class="serif-title" style="display: block; font-family: 'Playfair Display', Didot, Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 800; line-height: 1.25; color: #0a0a0a; text-decoration: none; text-transform: uppercase;">
+                    {{ cover_story.title }}
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Cover Story TL;DR -->
+              <tr>
+                <td style="padding-bottom: 14px;">
+                  <p style="font-size: 13.5px; line-height: 1.65; color: #374151; margin: 0;">
+                    {{ cover_story.tldr }}
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Pullquote "Why It Matters" (MAGZY Style Box) -->
+              {% if cover_story.why_it_matters %}
+              <tr>
+                <td style="padding-bottom: 16px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="pullquote-box" style="background-color: #f7f6f2; border-left: 3px solid #111111; margin: 4px 0;">
+                    <tr>
+                      <td style="padding: 12px 16px;">
+                        <span class="mono-meta" style="font-size: 9.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #111111; display: block; margin-bottom: 4px;">
+                          Editorial Takeaway:
+                        </span>
+                        <span class="serif-quote pullquote-text" style="font-family: 'Playfair Display', Georgia, serif; font-size: 13.5px; font-style: italic; line-height: 1.55; color: #1f2937;">
+                          “{{ cover_story.why_it_matters }}”
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              {% endif %}
+
+              <!-- Action Bar (Buttons strictly linking to drop page and direct repo) -->
+              <tr>
+                <td>
+                  <table cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                      <td style="padding-right: 8px;">
+                        <a href="{{ frontend_url }}/drop/{{ cover_story.video_id }}" target="_blank" class="action-pill-black mono-meta" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 10px 18px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-decoration: none; border-radius: 4px;">
+                          READ LEAD FEATURE →
+                        </a>
+                      </td>
+
+                      {% if cover_story.repo_links and cover_story.repo_links|length > 0 %}
+                      <td style="padding-right: 8px;">
+                        <a href="{{ cover_story.repo_links[0] }}" target="_blank" class="action-pill-secondary mono-meta" style="display: inline-block; background-color: #f3f2ee; color: #111111; border: 1px solid #d5d3cb; padding: 9px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
+                          GITHUB REPO ↗
+                        </a>
+                      </td>
+                      {% endif %}
+
+                      {% if cover_story.model_links and cover_story.model_links|length > 0 %}
+                      <td>
+                        <a href="{{ cover_story.model_links[0] }}" target="_blank" class="action-pill-secondary mono-meta" style="display: inline-block; background-color: #f3f2ee; color: #111111; border: 1px solid #d5d3cb; padding: 9px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-decoration: none; border-radius: 4px;">
+                          WEIGHTS ↗
+                        </a>
+                      </td>
+                      {% endif %}
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 2: 2-COLUMN EDITORIAL SPREAD (L'Officiel Inspiration)     -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        {% if editorial_pairs and editorial_pairs|length > 0 %}
+        <tr>
+          <td style="padding-top: 14px;">
+            
+            <!-- Section Header (Centered Serif with top & bottom borders) -->
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="mag-rule-black" style="border-top: 1px solid #111111; border-bottom: 1px solid #111111; margin-bottom: 24px;">
+              <tr>
+                <td align="center" style="padding: 9px 0;">
+                  <span class="serif-title" style="font-family: 'Playfair Display', Didot, 'Bodoni MT', Georgia, serif; font-size: 17px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #111111;">
+                    FEATURED STORIES & BREAKTHROUGHS
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- 2-Column Story Rows -->
+            {% for pair in editorial_pairs %}
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 20px;">
+              <tr>
+                
+                <!-- ── Item 1 (Left Column) ── -->
+                {% set item1 = pair[0] %}
+                <td width="48%" valign="top" class="grid-col" style="vertical-align: top;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                      <!-- Thumbnail (Left Side of Card) -->
+                      <td width="105" valign="top" style="width: 105px; padding-right: 12px;">
+                        <a href="{{ frontend_url }}/drop/{{ item1.video_id }}" target="_blank" style="display: block;">
+                          <img src="{{ item1.thumbnail_url }}" alt="{{ item1.title }}" class="thumb-img" width="105" height="80" style="display: block; width: 105px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e0ded8;" />
+                        </a>
+                      </td>
+
+                      <!-- Story Body (Right Side of Card) -->
+                      <td valign="top" style="vertical-align: top;">
+                        <span class="mono-meta body-muted" style="font-size: 9px; font-weight: 800; letter-spacing: 0.8px; color: #777777;">
+                          {{ item1.category_short|upper }}
+                        </span>
+
+                        <!-- Title strictly linking to drop page -->
+                        <a href="{{ frontend_url }}/drop/{{ item1.video_id }}" target="_blank" class="serif-title" style="display: block; font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 12.5px; font-weight: 800; line-height: 1.25; color: #0a0a0a; text-decoration: none; text-transform: uppercase; margin-top: 3px; margin-bottom: 5px;">
+                          {{ item1.title }}
+                        </a>
+
+                        <!-- 2-Sentence Concise Summary -->
+                        <p class="body-muted" style="font-size: 11px; line-height: 1.45; color: #4b5563; margin: 0 0 8px;">
+                          {{ item1.tldr | truncate(100) }}
+                        </p>
+
+                        <!-- Byline & Circular Action Arrow Button (L'Officiel Signature) -->
+                        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                          <tr>
+                            <td valign="middle">
+                              <span class="mono-meta body-muted" style="font-size: 9.5px; color: #888888;">
+                                via {{ item1.channel }}
+                              </span>
+                              {% if item1.repo_links and item1.repo_links|length > 0 %}
+                                <a href="{{ item1.repo_links[0] }}" target="_blank" style="font-size: 9.5px; color: #2563eb; text-decoration: underline; margin-left: 5px; font-weight: 600;">[Repo]</a>
+                              {% endif %}
+                            </td>
+                            <td align="right" valign="middle" style="width: 26px;">
+                              <a href="{{ frontend_url }}/drop/{{ item1.video_id }}" target="_blank" class="arrow-btn" style="display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; background-color: #000000; color: #ffffff; border-radius: 50%; font-size: 11px; font-weight: bold; text-decoration: none;">
+                                →
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+
+                <!-- ── 4% Spacer Column ── -->
+                <td width="4%" class="grid-spacer" style="width: 4%;"></td>
+
+                <!-- ── Item 2 (Right Column) ── -->
+                {% if pair|length > 1 %}
+                  {% set item2 = pair[1] %}
+                  <td width="48%" valign="top" class="grid-col" style="vertical-align: top;">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <!-- Thumbnail (Left Side of Card) -->
+                        <td width="105" valign="top" style="width: 105px; padding-right: 12px;">
+                          <a href="{{ frontend_url }}/drop/{{ item2.video_id }}" target="_blank" style="display: block;">
+                            <img src="{{ item2.thumbnail_url }}" alt="{{ item2.title }}" class="thumb-img" width="105" height="80" style="display: block; width: 105px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e0ded8;" />
+                          </a>
+                        </td>
+
+                        <!-- Story Body (Right Side of Card) -->
+                        <td valign="top" style="vertical-align: top;">
+                          <span class="mono-meta body-muted" style="font-size: 9px; font-weight: 800; letter-spacing: 0.8px; color: #777777;">
+                            {{ item2.category_short|upper }}
+                          </span>
+
+                          <!-- Title strictly linking to drop page -->
+                          <a href="{{ frontend_url }}/drop/{{ item2.video_id }}" target="_blank" class="serif-title" style="display: block; font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 12.5px; font-weight: 800; line-height: 1.25; color: #0a0a0a; text-decoration: none; text-transform: uppercase; margin-top: 3px; margin-bottom: 5px;">
+                            {{ item2.title }}
+                          </a>
+
+                          <!-- 2-Sentence Concise Summary -->
+                          <p class="body-muted" style="font-size: 11px; line-height: 1.45; color: #4b5563; margin: 0 0 8px;">
+                            {{ item2.tldr | truncate(100) }}
+                          </p>
+
+                          <!-- Byline & Circular Action Arrow Button (L'Officiel Signature) -->
+                          <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                            <tr>
+                              <td valign="middle">
+                                <span class="mono-meta body-muted" style="font-size: 9.5px; color: #888888;">
+                                  via {{ item2.channel }}
+                                </span>
+                                {% if item2.repo_links and item2.repo_links|length > 0 %}
+                                  <a href="{{ item2.repo_links[0] }}" target="_blank" style="font-size: 9.5px; color: #2563eb; text-decoration: underline; margin-left: 5px; font-weight: 600;">[Repo]</a>
+                                {% endif %}
+                              </td>
+                              <td align="right" valign="middle" style="width: 26px;">
+                                <a href="{{ frontend_url }}/drop/{{ item2.video_id }}" target="_blank" class="arrow-btn" style="display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; background-color: #000000; color: #ffffff; border-radius: 50%; font-size: 11px; font-weight: bold; text-decoration: none;">
+                                  →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                {% else %}
+                  <td width="48%" class="grid-col"></td>
+                {% endif %}
+
+              </tr>
+            </table>
+
+            <!-- Hairline dividing rule between rows -->
+            <div class="mag-rule-subtle" style="height: 1px; background-color: #eae8e1; margin-bottom: 20px;"></div>
+            {% endfor %}
+
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 3: NUMBERED CURATED BRIEFS (MAGZY 01, 02 Style)           -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        {% if numbered_briefs and numbered_briefs|length > 0 %}
+        <tr>
+          <td style="padding-top: 10px; padding-bottom: 24px;">
+            
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="mag-rule-black" style="border-top: 1px solid #111111; border-bottom: 1px solid #111111; margin-bottom: 20px;">
+              <tr>
+                <td align="center" style="padding: 8px 0;">
+                  <span class="serif-title" style="font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 15px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: #111111;">
+                    THE RADAR · NUMBERED BRIEFS
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            {% for brief in numbered_briefs %}
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 16px;">
+              <tr>
+                <!-- Large Number Column -->
+                <td width="42" valign="top" style="width: 42px; vertical-align: top;">
+                  <span class="serif-title" style="font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 26px; font-weight: 900; color: #b8b6ae; line-height: 1; display: block;">
+                    {{ brief.num_str }}
+                  </span>
+                </td>
+
+                <!-- Content Column -->
+                <td valign="top" style="vertical-align: top; padding-left: 10px;">
+                  <span class="mono-meta body-muted" style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #777777;">
+                    {{ brief.category_short|upper }} · VIA {{ brief.channel|upper }}
+                  </span>
+                  
+                  <a href="{{ frontend_url }}/drop/{{ brief.video_id }}" target="_blank" class="serif-title" style="display: block; font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #0a0a0a; text-decoration: none; text-transform: uppercase; margin: 2px 0 4px;">
+                    {{ brief.title }}
+                  </a>
+                  
+                  <p class="body-muted" style="font-size: 11.5px; line-height: 1.5; color: #4b5563; margin: 0 0 6px;">
+                    {{ brief.tldr }}
+                  </p>
+
+                  <div>
+                    <a href="{{ frontend_url }}/drop/{{ brief.video_id }}" target="_blank" class="mono-meta" style="font-size: 10px; font-weight: 800; color: #111111; letter-spacing: 0.5px; text-decoration: underline;">
+                      READ FULL TAKEAWAY →
+                    </a>
+                    {% if brief.repo_links and brief.repo_links|length > 0 %}
+                      <span style="color: #cccccc; margin: 0 4px;">|</span>
+                      <a href="{{ brief.repo_links[0] }}" target="_blank" style="font-size: 10px; color: #2563eb; text-decoration: underline;">GitHub ↗</a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <div class="mag-rule-subtle" style="height: 1px; background-color: #f0ede6; margin-bottom: 14px;"></div>
+            {% endfor %}
+
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 4: ISSUE CODE DIRECTORY & REPOSITORIES (Colophon Index)  -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        {% if resource_directory and resource_directory|length > 0 %}
+        <tr>
+          <td style="padding-top: 10px; padding-bottom: 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="directory-box" style="background-color: #faf9f5; border: 1px solid #e5e3dc; border-radius: 4px; padding: 20px;">
+              <tr>
+                <td>
+                  <span class="mono-meta" style="font-size: 10.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #111111; display: block; margin-bottom: 14px;">
+                    ISSUE #{{ edition.edition_number }} · CURATED CODE & REPOSITORY DIRECTORY
+                  </span>
+                  
+                  {% for res in resource_directory %}
+                  <div class="dir-row" style="padding: 7px 0; border-bottom: 1px dashed #e2e0d8; font-size: 12px;">
+                    <span class="dir-title" style="font-weight: 700; color: #111111;">{{ res.title }}</span>
+                    <span style="color: #999999; margin: 0 6px;">·</span>
+                    <a href="{{ res.url }}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline; font-family: monospace; font-size: 11px;">
+                      {{ res.type }} ↗
+                    </a>
+                    <span style="color: #999999; margin: 0 6px;">·</span>
+                    <a href="{{ frontend_url }}/drop/{{ res.video_id }}" target="_blank" class="body-muted" style="color: #666666; text-decoration: none; font-size: 11px;">
+                      Takeaways →
+                    </a>
+                  </div>
+                  {% endfor %}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 5: WEB PLATFORM ARCHIVE CALLOUT                          -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <tr>
+          <td style="padding-top: 10px; padding-bottom: 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" class="web-callout-box" style="background-color: #111111; border-radius: 4px; padding: 24px 20px; text-align: center;">
+              <tr>
+                <td>
+                  <p class="serif-title" style="font-family: 'Playfair Display', Didot, Georgia, serif; font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 1px; margin-bottom: 6px;">
+                    THE ARCHIVE IS LIVE ON THE WEB
+                  </p>
+                  <p style="font-size: 12.5px; color: #d1d5db; line-height: 1.5; margin-bottom: 18px; max-width: 480px; margin-left: auto; margin-right: auto;">
+                    Every single video, code repository, and transcript takeaway is indexed with full search and bookmarking capabilities.
+                  </p>
+                  <table align="center" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                      <td style="background-color: #ffffff; border-radius: 4px;">
+                        <a href="{{ frontend_url }}/edition/{{ edition.id }}" target="_blank" class="mono-meta" style="display: inline-block; padding: 11px 24px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.8px; color: #000000; text-decoration: none; border-radius: 4px;">
+                          OPEN EDITION #{{ edition.edition_number }} ON WEB →
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
             </table>
           </td>
         </tr>
 
-        <!-- ── 5. Footer ── -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
+        <!--  SECTION 6: MAGAZINE COLOPHON / FOOTER                            -->
+        <!-- ══════════════════════════════════════════════════════════════════ -->
         <tr>
-          <td style="padding: 32px 16px 8px; text-align: center;">
-            <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">
-              You received this digest because you subscribed to TechPulse (BeingNotified / Skills Letter).
+          <td align="center" style="border-top: 1px solid #111111; padding-top: 24px;">
+            <p class="mono-meta" style="font-size: 10.5px; font-weight: 700; letter-spacing: 2px; color: #111111; margin-bottom: 8px;">
+              TECHPULSE MAGAZINE · BEINGNOTIFIED
             </p>
-            <p style="font-size: 11px; color: #334155; margin: 0;">
-              <a href="{{ frontend_url }}" style="color: #6366f1; text-decoration: underline;">Web Home</a>
-              &nbsp;·&nbsp;
-              <a href="{{ frontend_url }}/archive" style="color: #64748b; text-decoration: underline;">All Archives</a>
-              &nbsp;·&nbsp;
-              <a href="{{ unsubscribe_url }}" style="color: #64748b; text-decoration: underline;">Unsubscribe / Manage Cadence</a>
+            <p class="body-muted" style="font-size: 11px; color: #666666; line-height: 1.6; margin-bottom: 12px;">
+              You received this journal because you are subscribed to TechPulse.<br/>
+              Frequency cadence: {{ subscriber_frequency_label or 'Curated Dispatch' }}.
             </p>
-            <p style="font-size: 10px; color: #1e293b; font-family: monospace; margin-top: 14px;">
-              © {{ year }} TechPulse. All rights reserved.
+            <p style="font-size: 11px; color: #444444; margin: 0;">
+              <a href="{{ frontend_url }}" target="_blank" style="color: #111111; font-weight: 600; text-decoration: underline;">Web Home</a>
+              &nbsp;·&nbsp;
+              <a href="{{ frontend_url }}/archive" target="_blank" style="color: #111111; font-weight: 600; text-decoration: underline;">All Archives</a>
+              &nbsp;·&nbsp;
+              <a href="{{ unsubscribe_url }}" target="_blank" style="color: #666666; text-decoration: underline;">Manage Frequency / Unsubscribe</a>
+            </p>
+            <p class="mono-meta body-muted" style="font-size: 9.5px; color: #999999; margin-top: 16px;">
+              © {{ year }} TECHPULSE JOURNAL · ALL RIGHTS RESERVED
             </p>
           </td>
         </tr>
 
-        <tr><td style="height: 36px;"></td></tr>
-
       </table>
+
     </td>
   </tr>
 </table>
+
 </body>
 </html>
