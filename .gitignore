@@ -53,3 +53,8 @@ desktop.ini
 # Copied session brain / transcripts (local machine only)
 6e51ba1f-632d-4a39-bb05-71ec0a978556*
 
+
+# Root raw media assets
+/Hero section *.mp4
+/Dark theme Hero.*
+/Light theme Hero.*

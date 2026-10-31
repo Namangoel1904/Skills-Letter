@@ -1,7 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Sparkles, Terminal, Youtube, Github, Twitter, Shield } from "lucide-react";
 
 export function Footer() {
+  const pathname = usePathname();
+  // Keep the Landing Home Page strictly non-scrollable without footer overflow
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <footer className="mt-24 border-t border-border/40 bg-card/20 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -20,6 +29,9 @@ export function Footer() {
         <div className="flex items-center gap-6 text-xs text-muted-foreground">
           <Link href="/" className="hover:text-foreground transition-colors">
             Home
+          </Link>
+          <Link href="/latest" className="hover:text-foreground transition-colors">
+            Latest Intel
           </Link>
           <Link href="/archive" className="hover:text-foreground transition-colors">
             Archive

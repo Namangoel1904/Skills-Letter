@@ -48,7 +48,7 @@ export function Navbar() {
         {/* Center navigation */}
         <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-muted/40 border border-border/50 backdrop-blur-md text-xs font-medium text-muted-foreground">
           <Link
-            href="/"
+            href="/latest"
             className="px-4 py-1.5 rounded-full text-foreground hover:bg-background/80 transition-all shadow-xs"
           >
             Latest Intel
