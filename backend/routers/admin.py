@@ -375,10 +375,10 @@ async def broadcast_edition(
     if not subscribers:
         raise HTTPException(status_code=400, detail="No active subscribers in database")
 
-    sent = send_newsletter(edition, subscribers)
+    sent = send_newsletter(edition, subscribers, ignore_schedule=True)
 
-    edition.status = NewsletterStatus.sent
-    edition.sent_at = datetime.now(timezone.utc)
+    edition.status = NewsletterStatus.sent if sent > 0 else NewsletterStatus.draft
+    edition.sent_at = datetime.utcnow() if sent > 0 else None
     edition.recipients_count = sent
     db.add(edition)
     await db.commit()

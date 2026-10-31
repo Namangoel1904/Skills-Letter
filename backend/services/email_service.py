@@ -381,10 +381,12 @@ def send_welcome_email(
 def send_newsletter(
     edition: NewsletterEdition,
     subscribers: List[Subscriber],
+    ignore_schedule: bool = False,
 ) -> int:
     """
     Send the newsletter to all eligible subscribers (respecting frequency prefs and signup date).
     Subscribers ONLY receive editions generated from the time they subscribed forward.
+    If ignore_schedule=True (e.g. manual admin trigger or testing run), active subscribers receive it regardless of day.
     Returns the count of emails actually sent.
     """
     _init_resend()
@@ -396,7 +398,7 @@ def send_newsletter(
     eligible = [
         s for s in subscribers
         if s.is_active
-        and should_send_today(s.frequency)
+        and (ignore_schedule or should_send_today(s.frequency))
         and (s.subscribed_at <= cutoff_time)
     ]
 

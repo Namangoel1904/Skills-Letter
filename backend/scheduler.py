@@ -31,7 +31,7 @@ async def _run_scheduled_generation():
     logger.info("⏰ Scheduled newsletter generation cycle starting...")
     async with AsyncSessionLocal() as session:
         try:
-            edition = await generate_newsletter(db=session, send_email=True)
+            edition = await generate_newsletter(db=session, send_email=True, is_cron=True)
             if edition:
                 logger.info(f"✅ Scheduled dispatch complete — Edition #{edition.edition_number} sent to {edition.recipients_count} subscribers")
             else:

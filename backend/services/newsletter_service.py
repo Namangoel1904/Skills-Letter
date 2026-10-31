@@ -36,6 +36,7 @@ async def generate_newsletter(
     db: AsyncSession,
     send_email: bool = True,
     allow_reprocess: bool = False,
+    is_cron: bool = False,
 ) -> Optional[NewsletterEdition]:
     """
     Full newsletter generation pipeline:
@@ -174,10 +175,11 @@ async def generate_newsletter(
             select(Subscriber).where(Subscriber.is_active == True)
         )
         subscribers = subscribers_result.all()
-        sent = send_newsletter(edition, subscribers)
+        # If manual trigger (not is_cron), send to all active subscribers regardless of today's weekday
+        sent = send_newsletter(edition, subscribers, ignore_schedule=not is_cron)
 
-        edition.status = NewsletterStatus.sent
-        edition.sent_at = datetime.now(timezone.utc)
+        edition.status = NewsletterStatus.sent if sent > 0 else NewsletterStatus.draft
+        edition.sent_at = datetime.utcnow() if sent > 0 else None
         edition.recipients_count = sent
         db.add(edition)
         await db.commit()
