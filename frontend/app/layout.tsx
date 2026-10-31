@@ -20,25 +20,25 @@ const headingFont = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "TechPulse — Weekly Intel for Developers & Builders",
-    template: "%s | TechPulse",
+    default: "Notified — The Chronicle of Open Source, Local AI & Vibe Coding",
+    template: "%s | Notified",
   },
   description:
     "AI-distilled intelligence on open-source repos, quantized local LLMs, cutting-edge Agentic workflows, and Apple-grade UI components.",
   keywords: [
+    "notified",
     "tech newsletter",
     "open source",
     "vibe coding",
     "quantized models",
     "claude skills",
     "cursor rules",
-    "shadcn",
     "developer tools",
   ],
   openGraph: {
     type: "website",
-    siteName: "TechPulse",
-    title: "TechPulse — The AI Newsletter for Modern Builders",
+    siteName: "Notified",
+    title: "Notified — The Chronicle of Open Source, Local AI & Vibe Coding",
     description: "Curated open source tools, local models, and developer skills delivered directly to your inbox.",
   },
 };

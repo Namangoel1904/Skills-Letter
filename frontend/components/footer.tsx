@@ -10,9 +10,9 @@ export function Footer() {
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p className="font-heading font-semibold text-sm">TechPulse</p>
+            <p className="font-heading font-semibold text-sm">Notified</p>
             <p className="text-xs text-muted-foreground">
-              Autonomous AI intelligence for engineers & builders.
+              The chronicle of open source, local AI & vibe coding.
             </p>
           </div>
         </div>
@@ -40,7 +40,7 @@ export function Footer() {
         </div>
 
         <p className="text-xs text-muted-foreground font-mono">
-          © {new Date().getFullYear()} TechPulse. Powered by Gemini.
+          © {new Date().getFullYear()} Notified. Powered by Gemini.
         </p>
       </div>
     </footer>

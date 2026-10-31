@@ -37,9 +37,9 @@ export function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-bold text-base tracking-tight text-foreground flex items-center gap-1.5">
-              TechPulse
+              Notified
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 leading-none">
-                PRO
+                CHRONICLE
               </span>
             </span>
           </div>

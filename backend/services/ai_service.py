@@ -54,7 +54,7 @@ Focus: Open-source repos, local LLMs, Cursor/Claude/AGY skills, UI libraries, .m
 Extract any GitHub, HuggingFace, or Ollama links mentioned.
 """
 
-NEWSLETTER_COMPOSE_PROMPT = """You are the editor of "TechPulse" — a premium tech newsletter for developers 
+NEWSLETTER_COMPOSE_PROMPT = """You are the editor of "Notified" — a high-craft magazine and technical chronicle for developers 
 who vibe-code, use AI tools, and love open-source.
 
 Below are summaries of {video_count} curated videos from this week.

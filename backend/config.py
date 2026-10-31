@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # ── Email ─────────────────────────────────────────────────────────────
     resend_api_key: str = ""
     from_email: str = "newsletter@example.com"
-    from_name: str = "TechPulse Newsletter"
+    from_name: str = "Notified"
 
     # ── App ───────────────────────────────────────────────────────────────
     admin_password: str = "admin"

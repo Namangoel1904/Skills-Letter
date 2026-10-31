@@ -140,7 +140,7 @@ async def generate_newsletter(
 
     # ── 7. Save edition to DB ─────────────────────────────────────────────
     edition = NewsletterEdition(
-        title=f"TechPulse #{edition_number} — Week of {date_str}",
+        title=f"Notified #{edition_number} — Week of {date_str}",
         edition_number=edition_number,
         playlist_ids=playlist_ids_used,
         video_count=len(summaries),
