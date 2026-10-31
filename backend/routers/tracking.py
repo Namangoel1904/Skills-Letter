@@ -361,4 +361,3 @@ async def resend_webhook(
     except Exception as e:
         logger.error(f"Error processing Resend webhook: {e}")
         return {"status": "error", "detail": str(e)}
-

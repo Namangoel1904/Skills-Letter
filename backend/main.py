@@ -6,7 +6,7 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
@@ -67,12 +67,3 @@ app.include_router(tracking.router)
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "Being Notified Newsletter API"}
-
-
-# ── Silent Handlers for Local Agent / IDE MCP Probes ─────────────────────────
-
-@app.api_route("/mcp", methods=["GET", "POST", "OPTIONS"])
-@app.api_route("/.well-known/{path:path}", methods=["GET", "POST", "OPTIONS"])
-async def ignore_mcp_probes():
-    """Silently absorb local MCP probes from IDEs and tools without log spam."""
-    return Response(status_code=204)

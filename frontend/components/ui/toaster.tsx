@@ -19,10 +19,6 @@ export function toast(msg: Omit<ToastMessage, "id">) {
   listeners.forEach((fn) => fn(item));
 }
 
-export function useToast() {
-  return { toast };
-}
-
 export function Toaster() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
