@@ -24,15 +24,13 @@ export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) 
         return;
       }
 
-      // Resize canvas to full window
       const width = (canvas.width = window.innerWidth);
       const height = (canvas.height = window.innerHeight);
 
-      const CELL = 22; // Pixel block size
+      const CELL = 20; // Pixel tile size
       const cols = Math.ceil(width / CELL);
       const rows = Math.ceil(height / CELL);
 
-      // Max distance from click point to furthest corner
       const maxDist = Math.max(
         Math.hypot(originX, originY),
         Math.hypot(width - originX, originY),
@@ -40,29 +38,32 @@ export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) 
         Math.hypot(width - originX, height - originY)
       );
 
-      const DURATION = 650; // ms
+      // Fast, snappy ripple duration (420ms)
+      const DURATION = 420;
       const startTime = performance.now();
       let completedCalled = false;
 
       const palette = [
-        "rgba(99, 102, 241, 0.95)", // Indigo
-        "rgba(56, 189, 248, 0.95)", // Cyan
-        "rgba(168, 85, 247, 0.95)", // Purple
-        "rgba(16, 185, 129, 0.95)", // Emerald
-        "rgba(15, 23, 42, 0.98)",   // Slate
-        "rgba(9, 9, 11, 1.0)",      // Obsidian
+        "rgba(99, 102, 241, ", // Indigo
+        "rgba(56, 189, 248, ", // Cyan
+        "rgba(168, 85, 247, ", // Purple
+        "rgba(16, 185, 129, ", // Emerald
+        "rgba(244, 114, 182, ", // Pink
       ];
 
       function render(now: number) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / DURATION, 1);
 
-        // Clear canvas with subtle trail
+        // Always clear canvas each frame - NEVER leave a black screen
         ctx!.clearRect(0, 0, width, height);
 
         // Radius of the expanding ripple wavefront
-        const waveRadius = progress * (maxDist * 1.3);
-        const waveWidth = 260; // thickness of the active ripple band
+        const waveRadius = progress * (maxDist * 1.25);
+        const waveWidth = 200; // Active wavefront thickness
+
+        // Fade out overall alpha as wave completes
+        const globalFade = 1 - Math.pow(progress, 2.5);
 
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
@@ -70,22 +71,20 @@ export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) 
             const cellCenterY = r * CELL + CELL / 2;
             const dist = Math.hypot(cellCenterX - originX, cellCenterY - originY);
 
-            // Check if cell is within the expanding ripple wavefront
             const diff = waveRadius - dist;
 
-            if (diff > -40 && diff < waveWidth) {
-              // Normalized position in the wave (0 at front, 1 at back)
-              const waveNorm = Math.max(0, Math.min(1, (diff + 40) / (waveWidth + 40)));
-
-              // Organic pixelation factor
-              const pseudoRand = ((c * 17 + r * 31 + Math.floor(elapsed / 40)) % 10) / 10;
-              const scale = Math.sin(waveNorm * Math.PI) * (0.85 + pseudoRand * 0.3);
+            if (diff > -20 && diff < waveWidth) {
+              const waveNorm = Math.max(0, Math.min(1, (diff + 20) / (waveWidth + 20)));
+              const pseudoRand = ((c * 17 + r * 31 + Math.floor(elapsed / 30)) % 10) / 10;
+              const scale = Math.sin(waveNorm * Math.PI) * (0.8 + pseudoRand * 0.35);
 
               if (scale > 0.05) {
-                const colorIdx = (c + r + Math.floor(elapsed / 60)) % palette.length;
-                ctx!.fillStyle = palette[colorIdx];
+                const colorBase = palette[(c + r + Math.floor(elapsed / 50)) % palette.length];
+                const alpha = Math.min(1, scale * 1.1 * globalFade);
 
-                const drawSize = Math.min(CELL, CELL * Math.max(0.1, scale));
+                ctx!.fillStyle = `${colorBase}${alpha.toFixed(2)})`;
+
+                const drawSize = Math.min(CELL, CELL * Math.max(0.15, scale));
                 const offset = (CELL - drawSize) / 2;
 
                 ctx!.fillRect(
@@ -95,21 +94,12 @@ export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) 
                   drawSize
                 );
               }
-            } else if (diff >= waveWidth && progress > 0.45) {
-              // Trailing pixel wipe that smoothly blankets into the destination page
-              const wipeProgress = (progress - 0.45) / 0.55;
-              const fillRand = ((c * 13 + r * 29) % 10) / 10;
-
-              if (fillRand < wipeProgress * 1.2) {
-                ctx!.fillStyle = "rgba(10, 10, 12, 0.96)";
-                ctx!.fillRect(c * CELL, r * CELL, CELL, CELL);
-              }
             }
           }
         }
 
-        // Trigger callback right before animation finishes so transition is seamless
-        if (progress >= 0.75 && !completedCalled) {
+        // Call navigation early while wave is expanding so transition feels instantaneous
+        if (progress >= 0.25 && !completedCalled) {
           completedCalled = true;
           onComplete?.();
         }
@@ -117,9 +107,8 @@ export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) 
         if (progress < 1) {
           animFrameRef.current = requestAnimationFrame(render);
         } else {
-          // Keep the screen covered momentarily until page unmounts
-          ctx!.fillStyle = "rgba(10, 10, 12, 1.0)";
-          ctx!.fillRect(0, 0, width, height);
+          // Clean finish: completely clear canvas
+          ctx!.clearRect(0, 0, width, height);
         }
       }
 

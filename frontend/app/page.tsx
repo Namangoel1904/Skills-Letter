@@ -32,7 +32,8 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    router.prefetch("/latest");
+  }, [router]);
 
   const isLight = mounted && (theme === "light" || resolvedTheme === "light");
 
@@ -64,35 +65,38 @@ export default function HomePage() {
         color={isLight ? "#4f46e5" : "#6366f1"}
       />
 
-      {/* ── 1. BACKGROUND VIDEO LOOP (High Transparency, Subtle Overlay) ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Dark Theme Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
-            isLight ? "opacity-0 pointer-events-none" : "opacity-90 dark:opacity-95"
-          )}
-          src="/videos/hero-dark.mp4"
-        />
+      {/* ── 1. BACKGROUND VIDEO LOOP (Refined Scale & Soft Radial Vignette) ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
+        {/* Centered bounded video stage with radial edge feathering */}
+        <div className="relative w-full max-w-5xl h-[68vh] max-h-[640px] flex items-center justify-center [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_45%,transparent_100%)]">
+          {/* Dark Theme Video */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={cn(
+              "w-full h-full object-contain scale-[0.82] sm:scale-[0.88] lg:scale-[0.92] transition-opacity duration-1000",
+              isLight ? "opacity-0 pointer-events-none" : "opacity-90 dark:opacity-95"
+            )}
+            src="/videos/hero-dark.mp4"
+          />
 
-        {/* Light Theme Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
-            isLight ? "opacity-95" : "opacity-0 pointer-events-none"
-          )}
-          src="/videos/hero-light.mp4"
-        />
+          {/* Light Theme Video */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={cn(
+              "w-full h-full object-contain scale-[0.82] sm:scale-[0.88] lg:scale-[0.92] transition-opacity duration-1000",
+              isLight ? "opacity-95" : "opacity-0 pointer-events-none"
+            )}
+            src="/videos/hero-light.mp4"
+          />
+        </div>
 
-        {/* High-transparency subtle glass wash (video remains clearly visible) */}
+        {/* High-transparency subtle glass wash */}
         <div className="absolute inset-0 bg-background/25 dark:bg-background/35 [.cozy_&]:bg-[#dfebe5]/40 backdrop-blur-[2px] transition-colors duration-700" />
 
         {/* Soft edge radial vignette for crisp text contrast */}
