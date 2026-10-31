@@ -47,7 +47,7 @@ services:
     plan: free
     region: oregon
     rootDir: frontend
-    buildCommand: corepack enable && pnpm install && pnpm build
+    buildCommand: npm install -g pnpm && pnpm install && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_VERSION
