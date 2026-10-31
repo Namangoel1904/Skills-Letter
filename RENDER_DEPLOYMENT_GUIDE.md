@@ -99,3 +99,4 @@ If you prefer to configure each service manually in the Render dashboard:
    - Latest Intel `/latest` renders the full dispatch catalog without errors.
    - Subscribing opens the modal and sends confirmation email.
    - `/admin` logs in with your `ADMIN_PASSWORD`.
+
