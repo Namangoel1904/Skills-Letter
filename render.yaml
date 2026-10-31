@@ -1,14 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 #  Render Blueprint Specification — BeingNotified Skill Letter
-#  Deploys PostgreSQL Database, FastAPI Backend, and Next.js Frontend
+#  Deploys FastAPI Backend and Next.js Frontend (reusing existing Database)
 # ─────────────────────────────────────────────────────────────────────────────
-
-databases:
-  - name: skill-letter-db
-    databaseName: skill_letter
-    user: skill_letter_user
-    plan: free
-    region: oregon
 
 services:
   # ── 1. Backend Web Service (FastAPI) ──────────────────────────────────────
@@ -24,9 +17,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DATABASE_URL
-        fromDatabase:
-          name: skill-letter-db
-          property: connectionString
+        sync: false
       - key: ADMIN_PASSWORD
         generateValue: true
       - key: FROM_NAME
