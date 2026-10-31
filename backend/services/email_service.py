@@ -98,7 +98,7 @@ def should_send_today(frequency: FrequencyOption) -> bool:
 
 def render_email_html(edition: NewsletterEdition, unsubscribe_url: str) -> str:
     """
-    Convert newsletter markdown → full HTML email using Jinja2 template.
+    Convert newsletter markdown + structured video cards → full HTML email using Jinja2 template.
     """
     from jinja2 import Environment, FileSystemLoader, select_autoescape
     import os
@@ -110,13 +110,79 @@ def render_email_html(edition: NewsletterEdition, unsubscribe_url: str) -> str:
     )
     template = env.get_template("newsletter_email.html")
 
+    # Group videos by category for structured card presentation
+    category_order = ["github_repo", "llm_model", "skill_tool", "ui_ux", "other"]
+    category_meta = {
+        "github_repo": {
+            "label": "Open Source Gems & Frameworks",
+            "icon": "🛠",
+            "description": "Breakthrough repositories & vibe-coding tooling",
+        },
+        "llm_model": {
+            "label": "Local AI Models & Weights",
+            "icon": "🤖",
+            "description": "Quantized weights & local inference checkpoints",
+        },
+        "skill_tool": {
+            "label": "Agentic Skills & Prompts",
+            "icon": "✨",
+            "description": "Cursor rules, Claude instructions & AGY prompts",
+        },
+        "ui_ux": {
+            "label": "UI / UX & Component Kits",
+            "icon": "🎨",
+            "description": "Design systems, Shadcn expansions & micro-interactions",
+        },
+        "other": {
+            "label": "Architectures & Deep Dives",
+            "icon": "📦",
+            "description": "System design & engineering technical discussions",
+        },
+    }
+
+    categorized_videos = []
+    videos = edition.videos or []
+    for cat_key in category_order:
+        cat_videos = [v for v in videos if v.get("category") == cat_key]
+        if cat_videos:
+            categorized_videos.append({
+                "key": cat_key,
+                "meta": category_meta.get(cat_key, category_meta["other"]),
+                "videos": cat_videos,
+            })
+
+    known_cats = set(category_order)
+    other_extras = [v for v in videos if v.get("category") not in known_cats]
+    if other_extras:
+        categorized_videos.append({
+            "key": "other",
+            "meta": category_meta["other"],
+            "videos": other_extras,
+        })
+
+    # Extract editorial intro from content_markdown (text before the first ##)
+    editorial_intro = ""
+    if edition.content_markdown:
+        parts = edition.content_markdown.split("## ", 1)
+        raw_intro = parts[0].strip()
+        lines = [
+            l for l in raw_intro.split("\n")
+            if not l.startswith("#")
+            and not l.startswith("**Date")
+            and not l.startswith("Date:")
+            and not l.startswith("---")
+        ]
+        editorial_intro = " ".join(l.strip() for l in lines if l.strip())
+
     content_html = md.markdown(
-        edition.content_markdown,
+        edition.content_markdown or "",
         extensions=["extra", "codehilite", "nl2br"],
     )
 
     return template.render(
         edition=edition,
+        categorized_videos=categorized_videos,
+        editorial_intro=editorial_intro,
         content_html=content_html,
         unsubscribe_url=unsubscribe_url,
         frontend_url=settings.frontend_url,
