@@ -368,7 +368,7 @@ def send_welcome_email(
         resend.Emails.send({
             "from": f"{settings.from_name} <{get_sender_email()}>",
             "to": subscriber.email,
-            "subject": f"Welcome to Notified — Subscription Confirmed ({schedule_info['label']})",
+            "subject": f"BeingNotified Skill Letter — Subscription Confirmed ({schedule_info['label']})",
             "html": html_body,
         })
         logger.info(f"Successfully sent welcome confirmation email to {subscriber.email}")
@@ -419,12 +419,13 @@ def send_newsletter(
                 subscriber_email=subscriber.email,
             )
 
-            # Professional subject without emojis
-            raw_title = (edition.title or "").replace("⚡", "").replace("TechPulse", "Notified").strip()
-            if not raw_title.lower().startswith("notified"):
-                subject = f"Notified Issue #{edition.edition_number}: {raw_title}"
-            else:
-                subject = raw_title
+            # Professional subject matching user specification: BeingNotified Skill Letter #X - Weekly Digest of Date
+            date_str = (
+                edition.generated_at.strftime("%B %d, %Y")
+                if edition.generated_at
+                else datetime.utcnow().strftime("%B %d, %Y")
+            )
+            subject = f"BeingNotified Skill Letter #{edition.edition_number} - Weekly Digest of {date_str}"
 
             resend.Emails.send({
                 "from": f"{settings.from_name} <{get_sender_email()}>",

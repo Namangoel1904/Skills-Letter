@@ -1,5 +1,5 @@
 """
-TechPulse Newsletter — FastAPI Application Entry Point
+Being Notified — FastAPI Application Entry Point
 """
 from __future__ import annotations
 
@@ -28,19 +28,19 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle handler."""
-    logger.info("🚀 TechPulse backend starting up...")
+    logger.info("🚀 Being Notified backend starting up...")
     await init_db()
     start_scheduler()
     yield
-    logger.info("👋 TechPulse backend shutting down...")
+    logger.info("👋 Being Notified backend shutting down...")
     stop_scheduler()
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="TechPulse Newsletter API",
-    description="Backend for the TechPulse tech newsletter — powered by Gemini AI",
+    title="Being Notified Newsletter API",
+    description="Backend for Being Notified — powered by Gemini AI",
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/api/docs",
@@ -65,4 +65,4 @@ app.include_router(admin.router)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "TechPulse Newsletter API"}
+    return {"status": "ok", "service": "Being Notified Newsletter API"}

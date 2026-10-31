@@ -97,6 +97,57 @@
   --sidebar-ring:oklch(0.556 0 0);
 }
 
+/* ── Cozy Read Theme (#a1c1b4, #dfebe5, #3c4a48, and white) ───────── */
+.cozy {
+  --background: #dfebe5;
+  --foreground: #3c4a48;
+  --card: #ffffff;
+  --card-foreground: #3c4a48;
+  --popover: #ffffff;
+  --popover-foreground: #3c4a48;
+  --muted: #edf4f0;
+  --muted-foreground: #5a6e6b;
+  --border: #a1c1b4;
+  --input: #a1c1b4;
+  --ring: #a1c1b4;
+
+  --primary: #3c4a48;
+  --primary-foreground: #ffffff;
+  --secondary: #edf4f0;
+  --secondary-foreground: #3c4a48;
+  --accent: #a1c1b4;
+  --accent-foreground: #222d2b;
+  --destructive: #be123c;
+  --destructive-foreground: #ffffff;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #3c4a48;
+  --sidebar-primary: #3c4a48;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dfebe5;
+  --sidebar-accent-foreground: #3c4a48;
+  --sidebar-border: #a1c1b4;
+  --sidebar-ring: #a1c1b4;
+}
+
+.cozy .glass-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: #a1c1b4;
+  box-shadow: 0 4px 24px rgba(60, 74, 72, 0.08), 0 1px 3px rgba(60, 74, 72, 0.05);
+}
+
+.cozy .tag-pill {
+  background-color: #dfebe5;
+  color: #3c4a48;
+  border-color: #a1c1b4;
+}
+
+.cozy .gradient-text {
+  background: linear-gradient(135deg, #2d3836 0%, #485c59 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 /* ── Base ──────────────────────────────────────────────────────────── */
 * { @apply border-border; }
 body { @apply bg-background text-foreground; }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Sparkles, Terminal, BellRing, ArrowUpRight, Shield } from "lucide-react";
+import { Sun, Moon, BookOpen, Sparkles, Terminal, BellRing, ArrowUpRight, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SubscribeModal } from "@/components/subscribe-modal";
@@ -79,16 +79,33 @@ export function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2.5">
-          {/* Theme switcher */}
+          {/* Theme switcher (Dark -> Light -> Cozy Read) */}
           {mounted && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={() => {
+                if (theme === "dark") setTheme("light");
+                else if (theme === "light") setTheme("cozy");
+                else setTheme("dark");
+              }}
               className="w-9 h-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               aria-label="Toggle theme"
+              title={
+                theme === "dark"
+                  ? "Current: Dark (Click for Light)"
+                  : theme === "light"
+                  ? "Current: Light (Click for Cozy Read)"
+                  : "Current: Cozy Read (Click for Dark)"
+              }
             >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4" />
+              ) : theme === "light" ? (
+                <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#3c4a48]" />
+              )}
             </Button>
           )}
 
