@@ -1,62 +1,45 @@
-import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
+import { AppShell } from "@/components/layout/app-shell";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const headingFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-});
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: {
-    default: "Notified — The Chronicle of Open Source, Local AI & Vibe Coding",
-    template: "%s | Notified",
+    default: "BeingNotified — Your playlists. Distilled into intelligence.",
+    template: "%s | BeingNotified",
   },
-  description:
-    "AI-distilled intelligence on open-source repos, quantized local LLMs, cutting-edge Agentic workflows, and Apple-grade UI components.",
-  keywords: [
-    "notified",
-    "tech newsletter",
-    "open source",
-    "vibe coding",
-    "quantized models",
-    "claude skills",
-    "cursor rules",
-    "developer tools",
-  ],
+  description: "A personal AI intelligence layer over YouTube playlists. Less watching. More knowing.",
   openGraph: {
     type: "website",
-    siteName: "Notified",
-    title: "Notified — The Chronicle of Open Source, Local AI & Vibe Coding",
-    description: "Curated open source tools, local models, and developer skills delivered directly to your inbox.",
+    siteName: "BeingNotified",
+    title: "BeingNotified — Your playlists. Distilled into intelligence.",
+    description: "AI-curated insights extracted from the videos you didn't have time to watch.",
   },
 };
+
+export const viewport: Viewport = { themeColor: "#09090b", width: "device-width", initialScale: 1 };
+
+/**
+ * Runs before first paint. If the intro will play, a black cover prevents a flash of the
+ * homepage; the cover has a CSS-only failsafe so a JS failure can never leave the screen blocked.
+ */
+const introBootstrap = `(function(){try{var s=sessionStorage.getItem('bn:intro-seen')==='1';var r=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!s&&!r&&location.pathname==='/'){document.documentElement.dataset.intro='play'}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${headingFont.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" themes={["light", "dark", "cozy"]} enableSystem={false}>
-          <div className="relative min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
-            {/* Ambient background light grid */}
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(99,102,241,0.18),rgba(0,0,0,0))] [.cozy_&]:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(161,193,180,0.35),rgba(223,235,229,0))] pointer-events-none -z-10" />
-            <div className="fixed inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: introBootstrap }} />
+        <style>{`html[data-intro="play"] body::before{content:"";position:fixed;inset:0;z-index:9990;background:#09090b;pointer-events:none;animation:bn-cover-failsafe .01s linear 6s forwards}@keyframes bn-cover-failsafe{to{opacity:0;visibility:hidden}}`}</style>
+      </head>
+      <body className={`${geist.variable} ${geistMono.variable} bg-background font-sans text-foreground antialiased selection:bg-primary/25`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" themes={["light", "dark"]} enableSystem={false}>
+          <AppShell>{children}</AppShell>
           <Toaster />
         </ThemeProvider>
       </body>

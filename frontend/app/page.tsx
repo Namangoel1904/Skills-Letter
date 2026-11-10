@@ -1,217 +1,164 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
-import {
-  Calendar,
-  Clock,
-  BellRing,
-  ShieldCheck,
-  Star,
-} from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, BellRing, Calendar, Clock, Film, Lightbulb, Newspaper } from "lucide-react";
+import { useCorpus, readingMinutes, flattenEditions } from "@/lib/hooks";
+import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/topics";
+import { formatDate } from "@/lib/utils";
+import { fadeUp, stagger } from "@/lib/motion";
+import { useIntroReady } from "@/components/intro/intro";
+import { useSubscribe } from "@/components/subscribe-modal";
+import { Magnetic } from "@/components/animation/magnetic";
+import { Reveal } from "@/components/animation/reveal";
+import { CategoryChips } from "@/components/content/category-chips";
+import { ContentCard } from "@/components/content/content-card";
+import { PipelineStrip } from "@/components/content/pipeline-strip";
+import { EmptyState, ErrorState, GridSkeleton } from "@/components/content/states";
 
-import HeroText from "@/components/ui/hero-shutter-text";
-import { UserCursor } from "@/components/ui/user-cursor";
-import { BlobTextRevealButton } from "@/components/ui/blob-text-reveal";
-import { IridescentSubscribeButton } from "@/components/ui/iridescent-subscribe-button";
-import {
-  PixelRippleTransition,
-  type PixelRippleHandle,
-} from "@/components/ui/pixel-ripple-transition";
-import { SubscribeModal } from "@/components/subscribe-modal";
-import { cn } from "@/lib/utils";
+function Metric({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid size-9 place-items-center rounded-lg bg-muted text-primary">
+        <Icon className="size-4" />
+      </span>
+      <div>
+        <p className="font-mono text-lg font-semibold leading-none">{value}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
-  const router = useRouter();
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const rippleRef = useRef<PixelRippleHandle>(null);
+  const ready = useIntroReady();
+  const { editions, items, error, isLoading, retry } = useCorpus();
+  const { open } = useSubscribe();
+  const [cat, setCat] = useState("all");
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 400], [0, 40]);
+  const glowOpacity = useTransform(scrollY, [0, 400], [1, 0.3]);
 
-  useEffect(() => {
-    setMounted(true);
-    router.prefetch("/latest");
-  }, [router]);
+  const latest = editions[0];
+  const latestItems = useMemo(() => (latest ? flattenEditions([latest]) : []), [latest]);
+  const insights = latestItems.reduce((n, v) => n + (v.key_points?.length ?? 0), 0);
+  const minutes = latestItems.reduce((n, v) => n + readingMinutes(v), 0);
+  const sources = new Set(latestItems.map((v) => v.source_playlist).filter(Boolean)).size;
 
-  const isLight = mounted && (theme === "light" || resolvedTheme === "light");
-
-  const handleReadNowClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const x = e.clientX || window.innerWidth / 2;
-    const y = e.clientY || window.innerHeight / 2;
-
-    if (rippleRef.current) {
-      rippleRef.current.trigger(x, y, () => {
-        router.push("/latest");
-      });
-    } else {
-      router.push("/latest");
-    }
-  };
+  const chips = useMemo(
+    () => [
+      { id: "all", label: "All", count: items.length },
+      ...CATEGORY_ORDER.filter((c) => items.some((i) => i.category === c)).map((c) => ({ id: c, label: CATEGORY_LABEL[c], count: items.filter((i) => i.category === c).length })),
+    ],
+    [items]
+  );
+  const shown = cat === "all" ? items : items.filter((i) => i.category === cat);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative h-screen w-full overflow-hidden flex flex-col justify-center items-center select-none px-4 sm:px-8 lg:px-12 cursor-default"
-    >
-      {/* ── 0. HARDWARE ACCELERATED PIXEL RIPPLE TRANSITION OVERLAY ── */}
-      <PixelRippleTransition ref={rippleRef} />
-
-      {/* ── 0. ORIGINKIT USER CURSOR (Velocity-Tilted Spring Tracker) ── */}
-      <UserCursor
-        name="Vibe Coder"
-        color={isLight ? "#4f46e5" : "#6366f1"}
-      />
-
-      {/* ── 1. BACKGROUND VIDEO LOOP (Refined Scale & Soft Radial Vignette) ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
-        {/* Centered bounded video stage with radial edge feathering */}
-        <div className="relative w-full max-w-5xl h-[68vh] max-h-[640px] flex items-center justify-center [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_45%,transparent_100%)]">
-          {/* Dark Theme Video */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className={cn(
-              "w-full h-full object-contain scale-[0.82] sm:scale-[0.88] lg:scale-[0.92] transition-opacity duration-1000",
-              isLight ? "opacity-0 pointer-events-none" : "opacity-90 dark:opacity-95"
+    <div className="mx-auto w-full max-w-[1500px] px-4 pb-20 pt-6 sm:px-6">
+      {/* Hero */}
+      <motion.section variants={stagger(0.09)} initial="hidden" animate={ready ? "show" : "hidden"} className="relative overflow-hidden rounded-3xl border border-border bg-elevated px-6 py-10 sm:px-10 sm:py-14">
+        <motion.div aria-hidden style={{ opacity: glowOpacity }} className="pointer-events-none absolute -right-24 -top-32 size-[420px] rounded-full bg-primary/20 blur-[110px]" />
+        <motion.div style={{ y: heroY }} className="relative max-w-3xl">
+          <motion.p variants={fadeUp} className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
+            {latest ? (
+              <>
+                <span className="inline-flex items-center gap-1.5 text-primary"><span className="size-1.5 animate-pulse rounded-full bg-primary" />EDITION #{latest.edition_number}</span>
+                <span className="inline-flex items-center gap-1.5"><Calendar className="size-3.5" />{formatDate(latest.generated_at, { month: "long", day: "numeric", year: "numeric" })}</span>
+              </>
+            ) : (
+              <span>BEINGNOTIFIED</span>
             )}
-            src="/videos/hero-dark.mp4"
-          />
+          </motion.p>
+          <motion.h1 variants={fadeUp} className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+            {latest ? "Your intelligence digest is ready." : "Your playlists. Distilled into intelligence."}
+          </motion.h1>
+          <motion.p variants={fadeUp} className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+            All the insights that matter, extracted from the videos you didn&apos;t have time to watch.
+          </motion.p>
 
-          {/* Light Theme Video */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className={cn(
-              "w-full h-full object-contain scale-[0.82] sm:scale-[0.88] lg:scale-[0.92] transition-opacity duration-1000",
-              isLight ? "opacity-95" : "opacity-0 pointer-events-none"
+          <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
+            <Magnetic>
+              <Link href="/latest" className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-accent-hover">
+                Read digest <ArrowRight className="size-4" />
+              </Link>
+            </Magnetic>
+            <Magnetic>
+              <button onClick={open} className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-background px-6 text-sm font-semibold transition-colors hover:bg-muted">
+                <BellRing className="size-4" /> Subscribe
+              </button>
+            </Magnetic>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="mt-9 flex flex-wrap gap-x-9 gap-y-4 border-t border-border pt-6">
+            {isLoading ? (
+              Array.from({ length: 3 }, (_, i) => <div key={i} className="bn-skeleton h-10 w-32" aria-hidden />)
+            ) : latest ? (
+              <>
+                <Metric icon={Film} label="videos processed" value={String(latest.video_count || latestItems.length)} />
+                <Metric icon={Lightbulb} label="insights generated" value={String(insights)} />
+                <Metric icon={Clock} label="min to read it all" value={String(minutes)} />
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Metrics appear once the first digest has been generated.</p>
             )}
-            src="/videos/hero-light.mp4"
-          />
+          </motion.div>
+        </motion.div>
+      </motion.section>
+
+      {/* Discovery */}
+      <section className="mt-8" aria-labelledby="discover-h">
+        <h2 id="discover-h" className="sr-only">Curated content</h2>
+        <div className="sticky top-14 z-20 -mx-4 bg-background/90 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6">
+          <CategoryChips chips={chips} active={cat} onChange={setCat} id="home" />
         </div>
 
-        {/* High-transparency subtle glass wash */}
-        <div className="absolute inset-0 bg-background/25 dark:bg-background/35 [.cozy_&]:bg-[#dfebe5]/40 backdrop-blur-[2px] transition-colors duration-700" />
-
-        {/* Soft edge radial vignette for crisp text contrast */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.3)_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]" />
-      </div>
-
-      {/* ── 2. HERO CONTENT LAYER (No Box Card — Directly Over Glassmorphism Overlay) ── */}
-      <div className="relative z-10 max-w-4xl w-full mx-auto flex flex-col justify-center items-start text-left space-y-6 sm:space-y-7">
-        {/* Top Metadata Pill Bar (Dispatch #3 · Date · Read time · Distilled items) */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-wrap items-center justify-between gap-4 w-full"
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/15 text-primary border border-primary/25 backdrop-blur-md shadow-xs">
-              DISPATCH #3
-            </span>
-            <span className="text-xs text-foreground/80 dark:text-zinc-300 flex items-center gap-1.5 font-mono">
-              <Calendar className="w-3.5 h-3.5 opacity-80" />
-              October 31, 2026
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-foreground/80 dark:text-zinc-300 font-mono">
-            <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 opacity-80" /> 4 min read
-            </span>
-            <span>·</span>
-            <span>3 items distilled</span>
-          </div>
-        </motion.div>
-
-        {/* Main Text: BeingNotified - Skill Letter (Sleek font + Shutter Animation) */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="w-full"
-        >
-          <HeroText
-            text="BeingNotified - Skill Letter"
-            align="left"
-            sizeClassName="font-heading text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-foreground leading-[1.12] drop-shadow-sm"
-            showControl={false}
-          />
-        </motion.div>
-
-        {/* Updated Subtitle: Explaining BeingNotified & Eliminating YouTube Doom-Scrolling */}
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-base sm:text-lg md:text-xl text-foreground/90 dark:text-zinc-200 [.cozy_&]:text-[#3c4a48] font-normal leading-relaxed max-w-3xl drop-shadow-xs"
-        >
-          Stop YouTube doom-scrolling. <strong className="font-semibold text-foreground dark:text-white">BeingNotified</strong> filters through 100+ weekly developer releases, trending open-source repositories, and local AI model weights to deliver handpicked, high-signal engineering intelligence straight to your workflow in a verified 4-minute read. No algorithmic traps, no clickbait—pure code &amp; weights.
-        </motion.p>
-
-        {/* Bottom Bar: Subscription Callout + Two Action Pills (Black & White) */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="w-full p-4 sm:p-5 rounded-2xl bg-background/55 dark:bg-zinc-950/50 [.cozy_&]:bg-[#3c4a48]/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-5"
-        >
-          {/* Left info label */}
-          <div className="flex items-center gap-3.5 text-left w-full lg:w-auto">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary shrink-0 border border-primary/25">
-              <BellRing className="w-4 h-4" />
+        <div className="mt-6">
+          {isLoading ? (
+            <GridSkeleton />
+          ) : error ? (
+            <ErrorState error={error} onRetry={retry} />
+          ) : shown.length === 0 ? (
+            <EmptyState icon={Newspaper} title="Nothing here yet" body="Once a digest is generated, curated videos and their AI breakdowns appear here." />
+          ) : (
+            <motion.div key={cat} variants={stagger(0.05)} initial="hidden" animate="show" className="grid gap-x-5 gap-y-9 sm:grid-cols-2 xl:grid-cols-3">
+              {shown.slice(0, 18).map((item) => (
+                <ContentCard key={item.video_id} item={item} />
+              ))}
+            </motion.div>
+          )}
+          {shown.length > 18 && (
+            <div className="mt-10 text-center">
+              <Link href="/discover" className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-5 text-sm font-medium hover:bg-muted">
+                Browse all {items.length} breakdowns <ArrowRight className="size-4" />
+              </Link>
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-semibold text-foreground">
-                Subscribe to this weekly digest
-              </p>
-              <p className="text-[11px] sm:text-xs text-muted-foreground">
-                Choose your frequency: Daily, 2x/week, 5x/week, or Weekly (Fridays 5PM IST).
-              </p>
+          )}
+        </div>
+      </section>
+
+      {/* Signal meter + recap */}
+      {latest && (
+        <Reveal className="mt-16 grid gap-6 rounded-3xl border border-border bg-elevated p-6 sm:p-8 lg:grid-cols-[1fr_1.3fr]">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-primary">Weekly intelligence recap</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">From {latest.video_count || latestItems.length} videos to {insights} insights.</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {sources} playlist source{sources === 1 ? "" : "s"} · {new Set(latestItems.map((v) => v.category)).size} topic areas · digest generated {formatDate(latest.generated_at)}.
+            </p>
+            <div className="mt-5" role="img" aria-label={`Signal meter: ${insights} insights distilled from ${latestItems.length} videos`}>
+              <div className="flex h-8 items-end gap-[3px]">
+                {latestItems.slice(0, 32).map((v, i) => (
+                  <motion.span key={v.video_id} className="w-full rounded-sm bg-primary" initial={{ height: 0 }} whileInView={{ height: `${20 + Math.min(80, (v.key_points?.length ?? 1) * 18)}%` }} viewport={{ once: true }} transition={{ delay: i * 0.03, duration: 0.5 }} />
+                ))}
+              </div>
+              <p className="mt-2 font-mono text-[11px] text-muted-foreground">Bar height = insights extracted per video</p>
             </div>
           </div>
-
-          {/* Right Two Pills: Black (Read Now! with Pixelated Ripple) & White (Iridescent Subscribe) */}
-          <div className="flex flex-wrap items-center gap-3.5 shrink-0 w-full sm:w-auto justify-end">
-            {/* Pill 1 (Black Pill): "Read Now!" with Blob Text Reveal & Transitioning Pixelated Ripple */}
-            <div onClick={handleReadNowClick} className="inline-block cursor-pointer">
-              <BlobTextRevealButton text="Read Now!" />
-            </div>
-
-            {/* Pill 2 (White Pill): "Subscribe Free" with Chromatic Iridescent Orbit Animation from video */}
-            <SubscribeModal>
-              <IridescentSubscribeButton text="Subscribe Free" />
-            </SubscribeModal>
-          </div>
-        </motion.div>
-
-        {/* Micro Credibility Badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex flex-wrap items-center gap-5 text-[11px] font-mono text-muted-foreground pt-1"
-        >
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            100% Tested Open Source
-          </span>
-          <span>·</span>
-          <span className="flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            150k+ Stars Curated
-          </span>
-          <span>·</span>
-          <span>Zero Clickbait Guarantee</span>
-        </motion.div>
-      </div>
+          <PipelineStrip />
+        </Reveal>
+      )}
     </div>
   );
 }

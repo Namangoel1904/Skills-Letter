@@ -1,0 +1,1157 @@
+# MASTER PROMPT — BEINGNOTIFIED FRONTEND REBUILD
+
+You are a world-class Senior Frontend Architect, Creative Developer, UI/UX Designer, and Full-Stack Integration Engineer.
+
+Your task is to completely transform my existing **BeingNotified / Skill Letter** application into a visually extraordinary, production-quality, YouTube-inspired AI content intelligence platform.
+
+I want the quality of a premium, award-winning modern SaaS product, not a conventional dashboard or generic AI-generated website.
+
+**IMPORTANT: Do not simply provide a design proposal, wireframes, or code snippets. Inspect the existing repository and IMPLEMENT the redesign directly in the project.**
+
+Work systematically, preserve existing business functionality, and ensure the frontend integrates with the real backend.
+
+---
+
+# 1. UNDERSTAND THE EXISTING PROJECT FIRST
+
+Project structure:
+
+```text
+Skills Letter/
+├── backend/
+├── frontend/
+├── .env.example
+└── README.md
+```
+
+Existing technology:
+
+**Frontend**
+- Next.js 15 App Router
+- React
+- TypeScript
+- Tailwind CSS v4
+- Radix UI
+- Framer Motion
+
+**Backend**
+- FastAPI
+- SQLModel
+- PostgreSQL
+- APScheduler
+- Gemini API
+- YouTube Data API v3
+- Resend
+
+The existing application collects videos from configured YouTube playlists, uses Gemini to generate curated insights and summaries, organizes these into digests, and sends personalized newsletters.
+
+Subscribers can select different delivery frequencies.
+
+## Mandatory repository audit
+
+Before modifying anything:
+
+1. Read the entire relevant frontend architecture.
+2. Inspect all backend routes and API schemas.
+3. Inspect database models and relationships.
+4. Understand playlist collection and video ingestion.
+5. Understand the Gemini summarization pipeline.
+6. Understand newsletter generation and scheduling.
+7. Understand subscription functionality.
+8. Examine existing environment variables.
+9. Identify which frontend features already work.
+10. Identify existing bugs, placeholder data, incomplete integrations, and unused components.
+
+Inspect important files such as:
+
+```text
+backend/main.py
+backend/requirements.txt
+backend/**/*
+frontend/package.json
+frontend/app/**/*
+frontend/src/**/*
+frontend/components/**/*
+frontend/lib/**/*
+.env.example
+README.md
+```
+
+Adapt to the actual repository structure.
+
+Create an internal API integration map identifying:
+
+- Existing endpoints
+- Request methods
+- Authentication requirements
+- Request payloads
+- Response schemas
+- Error responses
+- Frontend consumers
+
+**Do not assume endpoints exist. Discover them from the actual backend.**
+
+Do not invent backend functionality or silently replace live data with hardcoded mock data.
+
+If essential functionality is missing, implement the smallest appropriate backend extension while preserving existing behavior.
+
+---
+
+# 2. CORE PRODUCT VISION
+
+BeingNotified should feel like:
+
+**YouTube meets Linear meets a premium AI research assistant.**
+
+It must visually resemble the browsing familiarity of YouTube while remaining a distinct product with its own identity.
+
+The application is NOT a YouTube clone.
+
+It is a personalized intelligence layer over YouTube playlists.
+
+### Primary user journey
+
+```text
+User visits BeingNotified
+        ↓
+Premium animated introduction
+        ↓
+Modern content discovery homepage
+        ↓
+User adds YouTube playlist URLs
+        ↓
+System fetches relevant playlist content
+        ↓
+Gemini analyzes the videos
+        ↓
+AI extracts practical insights
+        ↓
+User explores summaries and breakdowns
+        ↓
+User configures newsletter frequency
+        ↓
+Curated intelligence arrives via email
+```
+
+The most important value proposition:
+
+**"Your playlists. Distilled into intelligence."**
+
+The application should make users feel they have a personal AI research assistant that continuously turns saved content into actionable knowledge.
+
+---
+
+# 3. VISUAL DESIGN DIRECTION
+
+Create a beautiful, minimalist, futuristic, YouTube-inspired experience.
+
+## Design aesthetic
+
+Combine:
+
+- YouTube's content discovery patterns
+- Linear's refined interaction design
+- Vercel's modern typography and spacing
+- Stripe's high-quality interactive elements
+- Premium editorial layouts
+- Subtle futuristic AI visualizations
+
+Avoid:
+
+- Generic SaaS dashboard templates
+- Excessive glowing gradients
+- Random glassmorphism everywhere
+- Oversized generic cards
+- Emoji-heavy layouts
+- Overcrowded navigation
+- Unnecessary visual noise
+- Cheap particle effects
+- Constant animation that distracts from reading
+
+## Color system
+
+Support both dark and light themes.
+
+Default to a premium dark theme.
+
+Suggested palette:
+
+```text
+Background:        #09090B
+Elevated surface:  #111114
+Card surface:      #18181B
+Secondary surface: #202024
+Border:            #2A2A30
+Primary text:      #FAFAFA
+Secondary text:    #A1A1AA
+Accent:            #FF3158
+Accent hover:      #FF4D70
+```
+
+Use a sophisticated red/coral accent inspired by YouTube, but create a recognizable BeingNotified identity.
+
+Use accent color selectively.
+
+## Typography
+
+Use modern fonts such as:
+
+- Geist
+- Inter
+- Geist Mono
+
+Use strong hierarchy and exceptional readability.
+
+Headings should feel bold and confident. Paragraphs must remain comfortable to read.
+
+---
+
+# 4. CREATE AN INCREDIBLE INTRO ANIMATION
+
+I specifically want a memorable animated experience before the user enters the main website.
+
+This should feel like a carefully art-directed product intro, not a generic loading spinner.
+
+## Intro concept: "FROM NOISE TO SIGNAL"
+
+Create an animated sequence that communicates what the platform does.
+
+### Scene 1 — The signal
+
+A nearly black background appears.
+
+Tiny, elegant red and white signals emerge from different positions.
+
+They represent fragmented online information.
+
+Use precise motion and refined lighting.
+
+### Scene 2 — Content convergence
+
+Subtle abstract video-card outlines and information fragments move toward the center.
+
+The movement should resemble scattered knowledge being organized.
+
+Cards should rotate and shift in subtle 3D perspective.
+
+No excessive bouncing.
+
+### Scene 3 — AI intelligence
+
+The content fragments converge.
+
+Thin animated connection lines form a sophisticated intelligence network.
+
+A luminous center emerges.
+
+The shapes merge into the BeingNotified brand icon.
+
+### Scene 4 — Brand reveal
+
+Reveal the text:
+
+**BEINGNOTIFIED**
+
+Underneath:
+
+**Less watching. More knowing.**
+
+Animate the typography with elegant staggered letter reveals.
+
+### Scene 5 — Transition into website
+
+The center brand mark transforms into the navbar logo.
+
+The intro background smoothly reveals the homepage beneath it.
+
+Navigation, content cards, and headlines appear using orchestrated staggered transitions.
+
+The transition must feel continuous rather than like an abrupt page switch.
+
+## Implementation guidelines
+
+Use:
+
+- Framer Motion / Motion
+- GSAP if genuinely beneficial
+- CSS transforms
+- SVG path animations
+- WebGL / Three.js only if the effect justifies the performance cost
+
+Prefer GPU-friendly transforms.
+
+Optimize the experience to run smoothly on ordinary laptops.
+
+Target a short, cinematic sequence of approximately 2–3 seconds on a normal connection.
+
+Add a clearly visible **Skip Intro** control.
+
+The intro should normally play once per browser session, not on every route change.
+
+Respect `prefers-reduced-motion`.
+
+The main content must never be blocked indefinitely by animation, API failures, or hydration issues.
+
+---
+
+# 5. CUSTOM CURSOR EXPERIENCE
+
+Create a beautiful custom interactive cursor for desktop pointer devices.
+
+I do not want a basic dot following the mouse.
+
+The cursor should intelligently respond to context.
+
+## Default cursor
+
+A small refined pointer indicator with a subtle trailing ring.
+
+The ring should follow the pointer using smooth spring-based motion.
+
+## Interactive states
+
+### Hover over content cards
+
+The cursor transforms into a circular indicator containing:
+
+**VIEW**
+
+or a minimal directional arrow.
+
+The card gently responds with a subtle elevation or depth effect.
+
+### Hover over video thumbnails
+
+Cursor changes to a tasteful play indicator.
+
+### Hover over links
+
+Cursor slightly expands and displays a directional arrow.
+
+### Hover over buttons
+
+Use a small magnetic attraction effect.
+
+Buttons should move toward the cursor only very slightly.
+
+### Hover over draggable content
+
+Show a drag indicator.
+
+### Click interaction
+
+Create a refined micro-pulse or ripple animation.
+
+No exaggerated explosions or particle bursts.
+
+## Technical requirements
+
+- Use pointer position smoothing.
+- Use requestAnimationFrame or appropriate motion primitives.
+- Avoid unnecessary React rerenders on every pointer move.
+- Preserve native cursor usability over inputs and editable areas.
+- Disable the custom cursor on touch devices.
+- Respect reduced-motion preferences.
+- Do not interfere with clicks, focus, text selection, accessibility, or scrolling.
+- Ensure cursor elements use `pointer-events: none`.
+
+All effects must feel expensive, precise, and intentional.
+
+---
+
+# 6. REDESIGN THE MAIN HOMEPAGE
+
+Build a YouTube-inspired content discovery interface.
+
+## Top navigation
+
+Include:
+
+- Animated BeingNotified logo
+- Sidebar toggle
+- Intelligent search bar
+- Notifications
+- Theme switch
+- Subscription CTA
+- User profile where authentication exists
+
+The search bar should have an attractive focused state.
+
+Implement actual search functionality using supported data sources.
+
+## Left sidebar
+
+Navigation should include:
+
+```text
+Home
+Latest Digest
+My Playlists
+Discover
+Topics
+Saved
+Archive
+Subscriptions
+Settings
+```
+
+Admin controls should appear only for authorized users.
+
+Do not fabricate authentication or authorization state.
+
+Use the existing architecture where possible.
+
+Sidebar features:
+
+- Collapsible navigation
+- Smooth width transitions
+- Animated active indicator
+- Beautiful icon transitions
+- Tooltips in collapsed mode
+- Mobile drawer navigation
+
+## Main hero area
+
+Create a premium hero introducing the current digest.
+
+Example:
+
+**Your weekly intelligence is ready.**
+
+Supporting text:
+
+"All the insights that matter, extracted from the videos you didn't have time to watch."
+
+Include:
+
+- Current digest date
+- Number of videos processed
+- Number of insights generated
+- Estimated reading time
+- Read digest CTA
+- Subscription CTA
+
+Only show metrics when supported by actual data.
+
+Create attractive loading states for unavailable data.
+
+## Topic navigation
+
+Use horizontal category chips:
+
+```text
+For You
+All
+AI & Agents
+Developer Tools
+Open Source
+Automation
+Architecture
+Deep Dives
+Productivity
+```
+
+The active category should transition smoothly.
+
+The filtered content must update correctly.
+
+## Content card grid
+
+Create an elegant YouTube-style responsive content grid.
+
+Desktop: approximately three cards per row where space allows.
+
+Each card should include:
+
+- Actual YouTube thumbnail where available
+- Source or channel
+- Video title
+- AI-generated summary
+- Key topic tags
+- Published date if available
+- Reading time if known
+- Source link
+- Read Breakdown button
+- Save action if persistence is supported
+
+Cards should have excellent hover interactions.
+
+Avoid showing invented video durations, timestamps, or AI scores.
+
+---
+
+# 7. BUILD THE PLAYLIST INTELLIGENCE EXPERIENCE
+
+This is one of the application's most important features.
+
+Create a dedicated page:
+
+**My Intelligence Sources**
+
+Users should be able to add their YouTube playlists and understand exactly how their content is being processed.
+
+## Playlist management
+
+Include:
+
+- Add playlist via URL or playlist ID
+- Playlist validation
+- Thumbnail preview
+- Playlist title
+- Video count where available
+- Last synchronization status
+- Enable/disable source
+- Remove source
+- Edit source
+- View ingested content
+
+Persist changes using the backend.
+
+If management endpoints do not exist, add them safely.
+
+## Important YouTube API behavior
+
+Support public or otherwise accessible playlists using the API key.
+
+Do not claim that an API key can retrieve private playlists or Watch Later content.
+
+Only implement Google OAuth if securely supported by the actual application and properly configured.
+
+If OAuth is not available, clearly explain that users must supply accessible playlist URLs.
+
+## Animated ingestion experience
+
+When a user initiates processing, show a highly polished pipeline visualization:
+
+```text
+Playlist Connected
+       ↓
+Fetching Videos
+       ↓
+Analyzing Content
+       ↓
+Extracting Insights
+       ↓
+Generating Digest
+       ↓
+Ready
+```
+
+Use animated connecting lines and progressive status indicators.
+
+This should look like a mini intelligence-processing control room.
+
+Crucially, progress must reflect actual backend state.
+
+If the backend does not provide progress events, implement a lightweight job-status endpoint or polling mechanism.
+
+Do not fake completion percentages or claim a job has finished before it actually has.
+
+---
+
+# 8. BUILD AN IMMERSIVE CONTENT BREAKDOWN PAGE
+
+This page should open when users click a curated item.
+
+Think:
+
+**YouTube video detail page + premium technical publication + AI research assistant.**
+
+## Layout
+
+Main content area:
+
+- Video thumbnail or embedded video
+- Title
+- Source information
+- AI-generated TL;DR
+- Key insights
+- Why it matters
+- Actionable takeaways
+- Code snippets or references where present
+- Original source links
+
+Right panel:
+
+- Related content
+- More from the same playlist
+- Similar topics
+- Other relevant digests
+
+## Special interaction
+
+Create an animated transition from the selected content card into its detail page.
+
+Use a shared-element transition where appropriate.
+
+The thumbnail should expand smoothly into the reader layout.
+
+Use scroll-based reveal animations for article sections.
+
+Add a beautiful reading progress indicator at the top.
+
+Potential advanced feature:
+
+**Watch vs Read**
+
+Where an embeddable video and AI summary are available, offer a clear toggle between the video experience and written breakdown.
+
+Never invent summaries or source links when the backend has not returned them.
+
+---
+
+# 9. BUILD A BEAUTIFUL DIGEST READER
+
+The current weekly digest should feel like a premium digital publication.
+
+Create a dedicated reading experience that includes:
+
+- Large editorial issue heading
+- Publication date
+- Estimated reading time
+- Clear section navigation
+- AI-curated stories
+- Expandable insights
+- Original source links
+- Save functionality where supported
+- Newsletter subscription CTA
+
+Add a sticky table of contents on larger screens.
+
+Add a subtle reading progress bar.
+
+Use smooth scrolling and section highlights.
+
+Support deep linking to specific digest sections.
+
+Make the typography excellent.
+
+The user must be able to read long-form content comfortably without visual distractions.
+
+---
+
+# 10. BUILD THE ARCHIVE AND LIBRARY
+
+Create a modern library page containing:
+
+- Previous digest editions
+- Saved breakdowns
+- Playlist sources
+- Topic collections
+
+Include:
+
+- Search
+- Filters
+- Date sorting
+- Topic filtering
+- Card/list view toggle
+- Empty states
+- Loading skeletons
+
+Every visible action must have meaningful functionality.
+
+Do not create decorative buttons that do nothing.
+
+---
+
+# 11. BUILD A PREMIUM SUBSCRIPTION EXPERIENCE
+
+Create a beautiful subscription modal or page.
+
+The user should be able to:
+
+1. Enter their email.
+2. Select newsletter frequency.
+3. Submit subscription.
+4. Receive clear success or error feedback.
+
+Supported frequency options:
+
+```text
+Daily
+5 times per week
+2 times per week
+Weekly
+```
+
+Display the actual schedule supported by the backend.
+
+Use existing subscription APIs.
+
+Do not report successful subscriptions unless the backend confirms them.
+
+## Subscription microinteraction
+
+On success:
+
+- Smooth card transformation
+- Elegant checkmark animation
+- Confirmation message
+- Subtle celebratory visual treatment
+
+Avoid excessive confetti.
+
+Support changing preferences or unsubscribing only where secure backend support exists.
+
+---
+
+# 12. ADVANCED MOTION DESIGN SYSTEM
+
+I want the entire website to feel exceptionally fluid.
+
+Build a reusable motion design system rather than scattering random animations throughout the codebase.
+
+## Page transitions
+
+Use route-aware transitions such as:
+
+- Fade + subtle slide
+- Shared element transitions
+- Staggered content reveals
+- Smooth sidebar transitions
+- Smooth modal transitions
+
+Avoid full-screen loading animations on every navigation.
+
+## Card interactions
+
+Implement:
+
+- Subtle lift on hover
+- Soft shadow changes
+- Slight border illumination
+- Elegant image zoom
+- Refined title or arrow transitions
+
+## Scroll effects
+
+Use:
+
+- Scroll-triggered reveals
+- Gentle parallax on selected hero elements
+- Animated section entrances
+- Reading-progress indicators
+
+Do not animate every paragraph individually.
+
+## Loading effects
+
+Create:
+
+- Beautiful skeleton screens
+- Playlist processing indicators
+- AI analysis animations
+- Button loading states
+- Empty-state transitions
+
+## Microinteractions
+
+Add:
+
+- Animated toggle switches
+- Animated checkboxes
+- Magnetic buttons
+- Interactive navigation underline
+- Toast notifications
+- Animated search focus states
+- Smooth accordion expansion
+- Animated theme switching
+- Polished dropdown menus
+
+## Animation engineering
+
+Centralize animation constants and reusable motion variants.
+
+Use consistent timing and easing.
+
+Prefer transform and opacity animations.
+
+Avoid layout thrashing and unnecessary expensive effects.
+
+Do not sacrifice responsiveness or readability for animation.
+
+---
+
+# 13. MAKE THE PRODUCT FEEL UNIQUE
+
+I do not want a generic YouTube clone.
+
+Introduce distinctive elements connected to BeingNotified's intelligence-focused identity.
+
+## Feature A — Signal Meter
+
+Show a subtle visual representation of how many items were processed and distilled.
+
+Use real metrics.
+
+## Feature B — Intelligence Pipeline
+
+A beautiful visual sequence representing:
+
+**Collect → Analyze → Distill → Deliver**
+
+This can appear on the homepage, onboarding, or processing screen.
+
+## Feature C — Animated Insight Reveal
+
+When opening an AI-generated breakdown, reveal its TL;DR and insights using elegant staggered motion.
+
+## Feature D — Knowledge Constellation
+
+Create an optional interactive visualization connecting topics, playlists, and insights.
+
+Only generate relationships from actual metadata.
+
+The visualization should remain lightweight and should not replace ordinary navigation.
+
+## Feature E — Weekly Intelligence Recap
+
+Create a visually compelling recap of:
+
+- Sources processed
+- Stories summarized
+- Topics covered
+- Digest generated
+
+All metrics must come from actual application data.
+
+---
+
+# 14. BACKEND INTEGRATION — NON-NEGOTIABLE
+
+The application must be fully functional.
+
+Do not build a beautiful frontend disconnected from the backend.
+
+## Integration requirements
+
+Create or improve a centralized, typed API client.
+
+Use the existing environment configuration:
+
+```text
+NEXT_PUBLIC_API_URL
+```
+
+Inspect the actual backend before choosing endpoint paths.
+
+Implement:
+
+- Typed request/response contracts
+- Proper loading states
+- Error boundaries
+- API failure handling
+- Retry functionality where appropriate
+- Request cancellation where needed
+- Input validation
+- Safe environment-variable handling
+
+Never expose:
+
+```text
+GEMINI_API_KEY
+YOUTUBE_API_KEY
+DATABASE_URL
+RESEND_API_KEY
+ADMIN_PASSWORD
+```
+
+in browser code.
+
+Do not hardcode localhost URLs into production logic.
+
+## Real application data
+
+The frontend must display actual:
+
+- Digests
+- Curated stories
+- Playlist information
+- AI-generated content
+- Subscription status where available
+- Generation status where available
+
+Do not leave hardcoded demo cards in the production experience.
+
+Demo content may exist only behind an explicit demo mode.
+
+## Backend improvements
+
+If necessary, extend FastAPI for:
+
+- Playlist management
+- Ingestion status
+- Digest retrieval
+- Story detail retrieval
+- Search/filtering
+- Subscription preference management
+
+Only implement extensions that are needed for the experience and compatible with the existing data model.
+
+Use migrations where persistent schema changes are required.
+
+Preserve existing API contracts or provide backward-compatible updates.
+
+Protect admin functionality.
+
+Never expose admin credentials in the client.
+
+---
+
+# 15. RESPONSIVENESS
+
+The application must work exceptionally well on:
+
+- Large desktop monitors
+- Standard laptops
+- Tablets
+- Mobile phones
+
+## Desktop
+
+YouTube-inspired sidebar and spacious content grid.
+
+## Tablet
+
+Compact navigation and responsive cards.
+
+## Mobile
+
+- Bottom navigation or accessible drawer
+- Touch-friendly content cards
+- Mobile-first playlist forms
+- Fluid reading experience
+- No custom mouse cursor
+- Optimized animations
+
+Ensure no horizontal overflow or unusable controls.
+
+---
+
+# 16. ACCESSIBILITY AND PERFORMANCE
+
+The animations must be premium but should never make the application frustrating.
+
+Requirements:
+
+- Keyboard navigation
+- Visible focus indicators
+- Semantic HTML
+- Accessible labels
+- Accessible modals
+- Reduced-motion support
+- Good contrast
+- Proper loading announcements
+- Responsive images
+- Lazy loading
+- Optimized font loading
+- Minimal layout shift
+- No scroll hijacking
+
+Target strong Lighthouse results.
+
+Do not load heavy animation libraries unnecessarily.
+
+Dynamic-import expensive visualizations.
+
+Do not use Three.js simply for a cosmetic effect that CSS or SVG can handle.
+
+Ensure smooth interaction on ordinary Windows laptops.
+
+---
+
+# 17. PROJECT ENGINEERING REQUIREMENTS
+
+Reuse existing working functionality.
+
+You may reorganize frontend architecture if necessary, but do not recklessly delete working code.
+
+Maintain clean component separation.
+
+Suggested frontend organization, adapted to the repository:
+
+```text
+frontend/
+├── app/
+│   ├── page.tsx
+│   ├── latest/
+│   ├── playlists/
+│   ├── discover/
+│   ├── digest/
+│   ├── archive/
+│   ├── saved/
+│   └── settings/
+├── components/
+│   ├── layout/
+│   ├── navigation/
+│   ├── animation/
+│   ├── cursor/
+│   ├── content/
+│   ├── playlist/
+│   ├── digest/
+│   └── ui/
+├── lib/
+│   ├── api/
+│   ├── motion/
+│   └── utils/
+└── styles/
+```
+
+You do not need to use this exact structure if the existing architecture suggests something better.
+
+Use existing packages where possible.
+
+Avoid unnecessary dependencies.
+
+Keep code production-quality, typed, maintainable, and documented.
+
+---
+
+# 18. IMPLEMENTATION ORDER
+
+Work in phases, but implement directly.
+
+### Phase 1 — Repository intelligence
+
+Inspect the repository and backend.
+
+Identify reusable components and APIs.
+
+Understand all relevant existing functionality.
+
+### Phase 2 — Design foundation
+
+Implement:
+
+- Design tokens
+- Typography
+- Theme system
+- Layout shell
+- Navigation
+- Reusable UI components
+- Motion primitives
+
+### Phase 3 — Intro and interaction system
+
+Implement:
+
+- Cinematic introduction
+- Custom cursor
+- Navigation transitions
+- Reusable hover effects
+- Loading states
+
+### Phase 4 — Core pages
+
+Implement:
+
+- Homepage
+- Latest digest
+- Playlist management
+- Content detail
+- Archive/library
+- Subscription experience
+
+### Phase 5 — Backend integration
+
+Connect every page to actual FastAPI endpoints.
+
+Extend backend only where necessary.
+
+### Phase 6 — Validation
+
+Run:
+
+- TypeScript validation
+- ESLint
+- Production build
+- Relevant backend tests
+- API integration tests
+
+Verify interactive states and loading/error behavior.
+
+Fix errors instead of leaving TODOs.
+
+---
+
+# 19. STRICT QUALITY STANDARDS
+
+Do not stop after making one attractive page.
+
+Do not leave incomplete navigation.
+
+Do not create fake integrations.
+
+Do not replace backend-driven functionality with static JSON.
+
+Do not claim that functionality works without testing it.
+
+Do not introduce broken imports.
+
+Do not expose secrets.
+
+Do not add animation effects that reduce accessibility.
+
+Do not destroy existing working functionality.
+
+Do not introduce incompatible database changes.
+
+Do not provide only instructions when implementation is possible.
+
+The final application should feel like a genuine premium startup product ready for users.
+
+---
+
+# 20. FINAL VERIFICATION AND REPORT
+
+After implementation:
+
+1. Run the frontend build.
+2. Run TypeScript checks.
+3. Run linting.
+4. Validate backend integration.
+5. Verify all important routes.
+6. Check desktop and mobile responsiveness.
+7. Test subscription functionality.
+8. Test playlist ingestion with the configured API where credentials are available.
+9. Verify loading, error, and empty states.
+10. Check intro animation, cursor behavior, and reduced-motion mode.
+
+If a test requires unavailable credentials or live infrastructure, report it as unverified instead of claiming success.
+
+Finally, provide:
+
+- Summary of the redesign
+- Pages implemented
+- Components created
+- APIs integrated
+- Backend changes
+- Packages installed
+- Environment variables required
+- Tests executed and results
+- Outstanding limitations
+- Exact commands to run locally
+- Deployment considerations for Render
+
+## FINAL CREATIVE DIRECTION
+
+The website should create an immediate emotional response:
+
+**"This feels like YouTube evolved into a personal AI intelligence platform."**
+
+The introduction should be cinematic.
+
+The cursor should feel alive.
+
+The transitions should feel effortless.
+
+The content should feel genuinely useful.
+
+The interface should be aesthetically exceptional but highly functional.
+
+Every detail should look intentional.
+
+Make it impressive enough to feature in a high-end product design portfolio.
+
+**Begin by auditing the actual project files, then implement the complete redesign. Do not stop at planning or visual mockups.**

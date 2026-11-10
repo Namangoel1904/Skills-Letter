@@ -6,7 +6,7 @@ export interface PixelRippleHandle {
   trigger: (x: number, y: number, onComplete?: () => void) => void;
 }
 
-export const PixelRippleTransition = forwardRef<PixelRippleHandle, {}>((_, ref) => {
+export const PixelRippleTransition = forwardRef<PixelRippleHandle, object>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameRef = useRef<number | null>(null);
 

@@ -1,315 +1,224 @@
-import { getDropDetail, CATEGORY_META } from "@/lib/api";
-import { notFound } from "next/navigation";
+"use client";
+
+import { use, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  Github, 
-  Cpu, 
-  Box, 
-  Sparkles, 
-  Layers, 
-  Calendar, 
-  Clock, 
-  ExternalLink, 
-  ArrowUpRight, 
-  Play, 
-  Share2, 
-  CheckCircle2, 
-  ChevronRight 
-} from "lucide-react";
-import type { Metadata } from "next";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { SubscribeModal } from "@/components/subscribe-modal";
-import { format } from "date-fns";
+import useSWR from "swr";
+import { motion } from "framer-motion";
+import { ArrowLeft, BookOpen, Calendar, Clock, Cpu, ExternalLink, FileSearch, Github, Play } from "lucide-react";
+import { ApiError, getDropDetail, trackWebClick, type DropDetail } from "@/lib/api";
+import { readingMinutes, useCorpus, type CorpusItem } from "@/lib/hooks";
+import { categoryLabel, normalizeTag } from "@/lib/topics";
+import { cn, formatDate, youtubeThumb } from "@/lib/utils";
+import { fadeUp, stagger } from "@/lib/motion";
+import { ReadingProgress } from "@/components/digest/reading-progress";
+import { Reveal } from "@/components/animation/reveal";
+import { SaveButton } from "@/components/content/content-card";
+import { EmptyState, ErrorState } from "@/components/content/states";
+import { PageContainer } from "@/components/layout/page-header";
 
-interface DropPageProps {
-  params: Promise<{ id: string }>;
+function RelatedList({ title, items }: { title: string; items: CorpusItem[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section aria-label={title}>
+      <h2 className="mb-3 text-sm font-semibold">{title}</h2>
+      <ul className="space-y-3">
+        {items.map((r) => (
+          <li key={r.video_id}>
+            <Link href={`/drop/${r.video_id}`} data-cursor="play" className="group flex gap-3">
+              <span className="relative aspect-video w-32 shrink-0 overflow-hidden rounded-lg bg-muted">
+                <Image src={r.thumbnail_url || youtubeThumb(r.video_id)} alt="" fill sizes="128px" loading="lazy" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+              </span>
+              <span className="min-w-0">
+                <span className="line-clamp-2 text-sm font-medium leading-snug group-hover:text-primary">{r.title}</span>
+                <span className="mt-0.5 block truncate text-xs text-muted-foreground">{r.channel}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
-export async function generateMetadata({ params }: DropPageProps): Promise<Metadata> {
-  const { id } = await params;
-  const detail = await getDropDetail(id).catch(() => null);
-  if (!detail || !detail.item) {
-    return { title: "Drop Not Found" };
+export default function DropPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, error, isLoading, mutate } = useSWR<DropDetail, ApiError>(["drop", id], () => getDropDetail(id), { revalidateOnFocus: false, shouldRetryOnError: false });
+  const { items } = useCorpus();
+  const [mode, setMode] = useState<"read" | "watch">("read");
+
+  const item = data?.item;
+  const related = useMemo(() => {
+    if (!item) return { playlist: [], topic: [], edition: [] };
+    const others = items.filter((i) => i.video_id !== item.video_id);
+    const tagSet = new Set((item.tags ?? []).map(normalizeTag));
+    return {
+      playlist: others.filter((i) => item.source_playlist && i.source_playlist === item.source_playlist).slice(0, 4),
+      topic: others
+        .map((i) => ({ i, score: (i.tags ?? []).filter((t) => tagSet.has(normalizeTag(t))).length + (i.category === item.category ? 0.5 : 0) }))
+        .filter((x) => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map((x) => x.i),
+      edition: data ? others.filter((i) => i.edition_id === data.edition_id).slice(0, 4) : [],
+    };
+  }, [items, item, data]);
+
+  if (error?.status === 404) {
+    return (
+      <PageContainer>
+        <EmptyState icon={FileSearch} title="Breakdown not found" body="This video isn't part of any generated digest." action={<Link href="/discover" className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground">Browse breakdowns</Link>} />
+      </PageContainer>
+    );
   }
-  return {
-    title: `${detail.item.title} — TechPulse`,
-    description: detail.item.tldr,
-  };
-}
-
-export const revalidate = 60;
-
-export default async function DropDetailPage({ params }: DropPageProps) {
-  const { id } = await params;
-  const detail = await getDropDetail(id).catch(() => null);
-
-  if (!detail || !detail.item) {
-    notFound();
+  if (error) {
+    return (
+      <PageContainer>
+        <ErrorState error={error} onRetry={() => mutate()} />
+      </PageContainer>
+    );
+  }
+  if (isLoading || !item || !data) {
+    return (
+      <PageContainer>
+        <div role="status" aria-label="Loading breakdown" className="grid gap-8 lg:grid-cols-[1fr_340px]">
+          <div className="space-y-4">
+            <div className="bn-skeleton aspect-video w-full" />
+            <div className="bn-skeleton h-9 w-3/4" />
+            <div className="bn-skeleton h-24 w-full" />
+          </div>
+          <div className="bn-skeleton hidden h-80 lg:block" />
+        </div>
+      </PageContainer>
+    );
   }
 
-  const { item, edition_id, edition_number, edition_title, edition_date } = detail;
-  const meta = CATEGORY_META[item.category] || CATEGORY_META.other;
+  const full: CorpusItem = { ...item, edition_id: data.edition_id, edition_number: data.edition_number, edition_title: data.edition_title, edition_date: data.edition_date };
+  const mins = readingMinutes(item);
+  const track = (url: string, gh = false) => void trackWebClick({ url, edition_id: data.edition_id, is_github: gh, tag: gh ? "github" : "source" });
 
   return (
-    <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Navigation Breadcrumb */}
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-8">
-          <Link
-            href={`/edition/${edition_id}`}
-            className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors font-medium"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Edition #{edition_number}
-          </Link>
-          <span>/</span>
-          <Link href="/" className="hover:text-foreground transition-colors">
-            All Dispatches
-          </Link>
-          <span>/</span>
-          <span className="text-foreground/80 font-mono truncate max-w-xs">{item.title}</span>
-        </div>
+    <>
+      <ReadingProgress />
+      <div className="mx-auto w-full max-w-[1280px] px-4 pb-24 pt-6 sm:px-6">
+        <Link href={`/edition/${data.edition_id}`} className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="size-4" /> Edition #{data.edition_number}
+        </Link>
 
-        {/* Header Hero Area */}
-        <div className="space-y-6 pb-8 border-b border-border/40 mb-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge
-              variant="secondary"
-              className="px-3 py-1 text-xs font-mono tracking-wider uppercase font-semibold bg-primary/10 text-primary border border-primary/20"
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <motion.article variants={stagger(0.08)} initial="hidden" animate="show" className="min-w-0">
+            {/* Thumbnail / embed */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted"
             >
-              {meta.emoji} {meta.label}
-            </Badge>
+              {mode === "watch" ? (
+                <iframe
+                  title={item.title}
+                  src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(item.video_id)}?rel=0`}
+                  className="absolute inset-0 size-full"
+                  allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              ) : (
+                <>
+                  <Image src={item.thumbnail_url || youtubeThumb(item.video_id)} alt={item.title} fill priority sizes="(max-width: 1024px) 100vw, 900px" className="object-cover" />
+                  <button onClick={() => setMode("watch")} data-cursor="play" aria-label="Watch the video here" className="absolute inset-0 grid place-items-center bg-black/20 transition-colors hover:bg-black/35">
+                    <span className="grid size-16 place-items-center rounded-full bg-primary text-white shadow-xl"><Play className="ml-1 size-7 fill-current" /></span>
+                  </button>
+                </>
+              )}
+            </motion.div>
 
-            <span className="text-xs text-muted-foreground flex items-center gap-1 font-mono">
-              <Calendar className="w-3.5 h-3.5" />
-              {edition_date ? format(new Date(edition_date), "MMMM d, yyyy") : "October 2026"}
-            </span>
-
-            <span className="text-border">·</span>
-
-            <span className="text-xs text-muted-foreground font-mono">
-              From Edition #{edition_number}
-            </span>
-          </div>
-
-          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.18]">
-            {item.title}
-          </h1>
-
-          {/* Quick Action Buttons Bar */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            {item.repo_links && item.repo_links.length > 0 && (
-              <a
-                href={item.repo_links[0]}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button className="h-10 px-5 rounded-xl font-semibold text-xs bg-foreground text-background hover:bg-foreground/90 transition-all shadow-sm">
-                  <Github className="w-4 h-4 mr-2" />
-                  View GitHub Repository
-                  <ArrowUpRight className="w-3.5 h-3.5 ml-1 opacity-70" />
-                </Button>
-              </a>
-            )}
-
-            {item.model_links && item.model_links.length > 0 && (
-              <a
-                href={item.model_links[0]}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" className="h-10 px-5 rounded-xl font-semibold text-xs border-border/70">
-                  <Cpu className="w-4 h-4 mr-2 text-violet-500" />
-                  Download Model Weights
-                  <ArrowUpRight className="w-3.5 h-3.5 ml-1 opacity-70" />
-                </Button>
-              </a>
-            )}
-
-            <a
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="ghost" className="h-10 px-4 rounded-xl text-xs text-muted-foreground hover:text-foreground">
-                <Play className="w-3.5 h-3.5 mr-1.5 text-primary" />
-                Watch on YouTube
-                <ArrowUpRight className="w-3 h-3 ml-1" />
-              </Button>
-            </a>
-          </div>
-        </div>
-
-        {/* Content Body */}
-        <div className="space-y-10">
-          {/* Executive Summary (TLDR) */}
-          <div className="p-6 rounded-2xl bg-card/60 border border-border/50 backdrop-blur-xl shadow-xs space-y-2">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-primary">
-              Executive Summary
-            </span>
-            <p className="text-base sm:text-lg text-foreground font-sans leading-relaxed">
-              {item.tldr}
-            </p>
-          </div>
-
-          {/* Full Key Insights & Capabilities (Uncut) */}
-          {item.key_points && item.key_points.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="font-heading text-lg sm:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                Key Capabilities & Technical Takeaways
-              </h2>
-
-              <div className="grid gap-3">
-                {item.key_points.map((point, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-border/40 bg-card/40 flex items-start gap-3 text-sm text-foreground/90 leading-relaxed font-sans"
-                  >
-                    <span className="flex h-5 w-5 rounded-full bg-primary/10 text-primary items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <span>{point}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Why It Matters for Developers (Uncut) */}
-          {item.why_it_matters && (
-            <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20 space-y-2">
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
-                Why It Matters For Builders
-              </h3>
-              <p className="text-sm sm:text-base text-foreground/90 font-sans leading-relaxed">
-                {item.why_it_matters}
+            <motion.div variants={fadeUp} className="mt-6">
+              <p className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span className="rounded-md bg-primary/15 px-2 py-0.5 font-medium text-primary">{categoryLabel(item.category)}</span>
+                <span className="font-medium text-foreground/80">{item.channel}</span>
+                {item.published_at && <span className="inline-flex items-center gap-1"><Calendar className="size-3" />{formatDate(item.published_at)}</span>}
+                <span className="inline-flex items-center gap-1"><Clock className="size-3" />{mins} min read</span>
               </p>
-            </div>
-          )}
+              <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{item.title}</h1>
 
-          {/* Extracted Links & Open Source Resources */}
-          {((item.repo_links && item.repo_links.length > 0) || (item.model_links && item.model_links.length > 0)) && (
-            <div className="space-y-4 pt-2">
-              <h3 className="font-heading text-base font-bold text-foreground flex items-center gap-2">
-                <Github className="w-4 h-4 text-primary" />
-                Referenced Codebases & Downloadable Artifacts
-              </h3>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <div className="flex rounded-full border border-border p-0.5" role="group" aria-label="View mode">
+                  {([["read", "Read", BookOpen], ["watch", "Watch", Play]] as const).map(([m, label, Icon]) => (
+                    <button key={m} onClick={() => setMode(m)} aria-pressed={mode === m} className={cn("inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium transition-colors", mode === m ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}>
+                      <Icon className="size-3.5" />{label}
+                    </button>
+                  ))}
+                </div>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={() => track(item.url)} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3.5 text-sm hover:bg-muted"><ExternalLink className="size-4" />Original video</a>
+                <SaveButton item={full} label />
+              </div>
+            </motion.div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {item.repo_links?.map((link, idx) => (
-                  <a
-                    key={`repo-${idx}`}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-4 rounded-xl border border-border/50 bg-card/50 hover:bg-card hover:border-primary/40 transition-all group flex items-start justify-between gap-3"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
-                        <Github className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">GitHub Repository</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground font-mono truncate mt-1">
-                        {link.replace(/^https?:\/\/(www\.)?github\.com\//, "")}
-                      </p>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
-                  </a>
-                ))}
+            {/* TL;DR */}
+            {item.tldr && (
+              <motion.section variants={fadeUp} className="mt-8 rounded-2xl border border-primary/30 bg-primary/[0.06] p-5 sm:p-6" aria-labelledby="tldr-h">
+                <h2 id="tldr-h" className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">TL;DR</h2>
+                <p className="mt-2 text-xl leading-relaxed sm:text-[22px]">{item.tldr}</p>
+              </motion.section>
+            )}
 
-                {item.model_links?.map((link, idx) => (
-                  <a
-                    key={`model-${idx}`}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-4 rounded-xl border border-border/50 bg-card/50 hover:bg-card hover:border-violet-500/40 transition-all group flex items-start justify-between gap-3"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:text-violet-400 transition-colors">
-                        <Cpu className="w-3.5 h-3.5 text-violet-500 shrink-0" />
-                        <span className="truncate">Model Weights / Checkpoint</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground font-mono truncate mt-1">
-                        {link}
-                      </p>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-violet-400 shrink-0 transition-colors" />
-                  </a>
+            {/* Key insights */}
+            {item.key_points?.length > 0 && (
+              <section className="mt-10" aria-labelledby="insights-h">
+                <h2 id="insights-h" className="text-xl font-semibold tracking-tight">Key insights</h2>
+                <motion.ol variants={stagger(0.1, 0.15)} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-4 space-y-4">
+                  {item.key_points.map((p, i) => (
+                    <motion.li key={i} variants={fadeUp} className="flex gap-4">
+                      <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-muted font-mono text-xs font-semibold text-primary">{i + 1}</span>
+                      <p className="text-[17px] leading-[1.7] text-foreground/90">{p}</p>
+                    </motion.li>
+                  ))}
+                </motion.ol>
+              </section>
+            )}
+
+            {item.why_it_matters && (
+              <Reveal className="mt-10">
+                <section aria-labelledby="why-h">
+                  <h2 id="why-h" className="text-xl font-semibold tracking-tight">Why it matters</h2>
+                  <p className="mt-3 border-l-2 border-primary pl-5 text-[17px] leading-[1.75] text-foreground/90">{item.why_it_matters}</p>
+                </section>
+              </Reveal>
+            )}
+
+            {(item.repo_links?.length > 0 || item.model_links?.length > 0) && (
+              <Reveal className="mt-10">
+                <section aria-labelledby="refs-h">
+                  <h2 id="refs-h" className="text-xl font-semibold tracking-tight">References</h2>
+                  <ul className="mt-3 space-y-2">
+                    {item.repo_links?.map((l) => (
+                      <li key={l}><a href={l} target="_blank" rel="noopener noreferrer" onClick={() => track(l, true)} className="inline-flex items-center gap-2 break-all font-mono text-sm text-primary hover:underline"><Github className="size-4 shrink-0" />{l}</a></li>
+                    ))}
+                    {item.model_links?.map((l) => (
+                      <li key={l}><a href={l} target="_blank" rel="noopener noreferrer" onClick={() => track(l)} className="inline-flex items-center gap-2 break-all font-mono text-sm text-primary hover:underline"><Cpu className="size-4 shrink-0" />{l}</a></li>
+                    ))}
+                  </ul>
+                </section>
+              </Reveal>
+            )}
+
+            {item.tags?.length > 0 && (
+              <div className="mt-10 flex flex-wrap gap-2">
+                {item.tags.map((t) => (
+                  <Link key={t} href={`/discover?tag=${encodeURIComponent(t)}`} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground hover:bg-primary/15 hover:text-primary">{t}</Link>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </motion.article>
 
-          {/* Direct Embedded Player Reference */}
-          <div className="space-y-3 pt-6 border-t border-border/40">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-heading text-base font-bold text-foreground">
-                  Original Source Recording
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  Referenced from channel: <span className="font-medium text-foreground">{item.channel}</span>
-                </p>
-              </div>
-
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline flex items-center gap-1 font-medium font-mono"
-              >
-                <span>Open on YouTube</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            {/* Embedded responsive YouTube video */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-border/50 bg-black/60 shadow-lg">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${item.video_id}`}
-                title={item.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-          </div>
-
-          {/* Tags */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-4">
-              <span className="text-xs text-muted-foreground mr-1">Tags:</span>
-              {item.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 rounded-lg text-xs font-mono bg-muted/60 text-muted-foreground border border-border/30"
-                >
-                  #{tag.toLowerCase().replace(/\s+/g, "")}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Bottom Newsletter Subscription CTA */}
-          <div className="mt-16 p-8 rounded-3xl bg-gradient-to-b from-card/80 to-card/30 border border-border/50 text-center relative overflow-hidden">
-            <h3 className="font-heading text-xl sm:text-2xl font-bold mb-2 tracking-tight">
-              Get drops like this every week.
-            </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto mb-5 font-sans">
-              Stay on top of local LLMs, developer skills, and top open-source tools.
-            </p>
-            <SubscribeModal>
-              <Button size="lg" className="rounded-xl px-7 font-semibold text-xs h-10 shadow-md">
-                Subscribe to TechPulse
-              </Button>
-            </SubscribeModal>
-          </div>
+          <aside className="space-y-8 lg:sticky lg:top-20 lg:self-start">
+            <RelatedList title="More from this playlist" items={related.playlist} />
+            <RelatedList title="Similar topics" items={related.topic} />
+            <RelatedList title={`From Edition #${data.edition_number}`} items={related.edition} />
+          </aside>
         </div>
       </div>
-    </div>
+    </>
   );
 }

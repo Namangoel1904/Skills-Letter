@@ -56,9 +56,19 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const error = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(error.detail ?? "API request failed");
+    const detail = typeof error.detail === "string" ? error.detail : "API request failed";
+    throw new ApiError(detail, res.status);
   }
   return res.json();
+}
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
 }
 
 // ── Newsletter Editions ────────────────────────────────────────────────────
@@ -69,6 +79,11 @@ export async function getLatestEdition(): Promise<NewsletterEdition> {
 
 export async function getEditions(skip = 0, limit = 20): Promise<NewsletterEdition[]> {
   return apiFetch<NewsletterEdition[]>(`/api/newsletter/editions?skip=${skip}&limit=${limit}`);
+}
+
+/** Fetch up to `limit` editions (backend caps at 100) for client-side search & discovery. */
+export async function getAllEditions(limit = 100, signal?: AbortSignal): Promise<NewsletterEdition[]> {
+  return apiFetch<NewsletterEdition[]>(`/api/newsletter/editions?skip=0&limit=${limit}`, { signal });
 }
 
 export async function getEdition(id: number): Promise<NewsletterEdition> {
@@ -98,6 +113,13 @@ export async function subscribe(payload: SubscribePayload): Promise<{ id: number
 
 export async function unsubscribe(token: string): Promise<{ message: string }> {
   return apiFetch(`/api/subscribers/unsubscribe?token=${token}`, { method: "POST" });
+}
+
+export async function unsubscribeByEmail(email: string): Promise<{ success: boolean; message: string; email: string }> {
+  return apiFetch("/api/subscribers/unsubscribe", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
 }
 
 export async function getSubscriberCount(): Promise<{ count: number }> {

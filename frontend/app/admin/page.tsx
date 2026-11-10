@@ -1026,7 +1026,7 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="p-8 rounded-2xl border border-dashed border-border/60 text-center text-xs text-muted-foreground">
-              No editions recorded yet. Click "Trigger Run Now" above to generate your first issue.
+              No editions recorded yet. Click &quot;Trigger Run Now&quot; above to generate your first issue.
             </div>
           )}
         </section>
